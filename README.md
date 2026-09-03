@@ -1,5 +1,4 @@
 # DYPConnect
-
 **Connect. Collaborate. Grow Together.**
 
 DYPConnect is a professional networking platform built exclusively for the D. Y. Patil College community — connecting **students**, **teachers/faculty**, and **alumni** in one place, similar in spirit to LinkedIn but focused on a single college ecosystem.
