@@ -166,7 +166,3 @@ Built one step at a time, with clean, understandable, and maintainable code — 
 Final-year Computer Science student, D. Y. Patil College
 
 ---
-
-## 📄 License
-
-No license added yet.
