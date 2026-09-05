@@ -1,0 +1,132 @@
+/* Hero */
+.hero {
+  background: linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%);
+  padding: 64px 0;
+}
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.hero-text h1 {
+  font-size: 2.75rem;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 20px;
+}
+
+.hero-highlight {
+  color: var(--color-primary);
+}
+
+.hero-text p {
+  color: var(--color-text-muted);
+  font-size: 1.05rem;
+  margin-bottom: 28px;
+  max-width: 480px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.hero-image-placeholder {
+  height: 320px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-navy) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+/* Features */
+.features {
+  padding: 72px 0;
+}
+
+.section-heading {
+  text-align: center;
+  font-size: 1.9rem;
+  font-weight: 800;
+  margin-bottom: 40px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.feature-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+}
+
+.feature-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin: 0 auto 16px;
+}
+
+.feature-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.feature-card p {
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+/* Stats */
+.stats {
+  background: var(--color-navy);
+  padding: 40px 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: white;
+}
+
+.stat-label {
+  color: #94A3B8;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+@media (max-width: 860px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+  }
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
