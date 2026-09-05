@@ -21,6 +21,12 @@
   font-weight: 700;
 }
 
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
 .logo-accent {
   color: var(--color-primary);
 }

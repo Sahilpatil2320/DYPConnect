@@ -1,11 +1,15 @@
 import "./Footer.css";
+import logo from "../assets/logo.png";
 
 function Footer() {
   return (
     <footer className="footer">
       <div className="container footer-grid">
         <div>
-          <div className="footer-logo">🛡️ DYPConnect</div>
+          <div className="footer-logo">
+            <img src={logo} alt="DYPConnect logo" className="footer-logo-icon" />
+            DYPConnect
+          </div>
           <p className="footer-tagline">One Network. Endless Opportunities.</p>
         </div>
 
@@ -31,7 +35,7 @@ function Footer() {
 
         <div>
           <h4>Contact Us</h4>
-          <p>D. Y. Patil College,<br />Akurdi, Pune,<br />Maharashtra 411044</p>
+          <p>D Y Patil College of Engineering<br />and Technology,<br />Kasaba Bawada, Kolhapur</p>
           <p>connect@dypatil.edu</p>
           <p>+91 1234567890</p>
         </div>

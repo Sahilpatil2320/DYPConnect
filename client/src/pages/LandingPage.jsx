@@ -1,4 +1,5 @@
 import "./LandingPage.css";
+import campusImage from "../assets/campus.jpg";
 
 function LandingPage() {
   const features = [
@@ -46,7 +47,8 @@ function LandingPage() {
             </h1>
             <p>
               DYPConnect is the official networking platform for students,
-              faculty and alumni of D. Y. Patil College.
+              faculty and alumni of D Y Patil College of Engineering and
+              Technology, Kolhapur.
             </p>
             <div className="hero-actions">
               <button className="btn btn-primary">Get Started</button>
@@ -54,7 +56,7 @@ function LandingPage() {
             </div>
           </div>
           <div className="hero-image">
-            <div className="hero-image-placeholder">D. Y. PATIL COLLEGE</div>
+            <img src={campusImage} alt="D Y Patil College of Engineering and Technology, Kolhapur" className="hero-image-photo" />
           </div>
         </div>
       </section>

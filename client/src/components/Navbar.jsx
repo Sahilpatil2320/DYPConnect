@@ -1,11 +1,12 @@
 import "./Navbar.css";
+import logo from "../assets/logo.png";
 
 function Navbar() {
   return (
     <header className="navbar">
       <div className="container navbar-inner">
         <div className="navbar-logo">
-          <span className="logo-icon">🛡️</span>
+          <img src={logo} alt="DYPConnect logo" className="logo-icon" />
           <span className="logo-text">
             DYP<span className="logo-accent">Connect</span>
           </span>
