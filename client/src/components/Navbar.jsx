@@ -1,0 +1,31 @@
+import "./Navbar.css";
+
+function Navbar() {
+  return (
+    <header className="navbar">
+      <div className="container navbar-inner">
+        <div className="navbar-logo">
+          <span className="logo-icon">🛡️</span>
+          <span className="logo-text">
+            DYP<span className="logo-accent">Connect</span>
+          </span>
+        </div>
+
+        <nav className="navbar-links">
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#features">Features</a>
+          <a href="#network">Network</a>
+          <a href="#contact">Contact</a>
+        </nav>
+
+        <div className="navbar-actions">
+          <button className="btn btn-outline">Log In</button>
+          <button className="btn btn-primary">Sign Up</button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export default Navbar;
