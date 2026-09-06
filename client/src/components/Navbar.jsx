@@ -22,7 +22,7 @@ function Navbar() {
         </nav>
 
         <div className="navbar-actions">
-          <button className="btn btn-outline">Log In</button>
+          <Link to="/login" className="btn btn-outline">Log In</Link>
           <Link to="/signup" className="btn btn-primary">Sign Up</Link>
         </div>
       </div>
