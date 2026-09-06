@@ -1,5 +1,6 @@
 import "./LandingPage.css";
 import campusImage from "../assets/campus.jpg";
+import { Link } from "react-router-dom";
 
 function LandingPage() {
   const features = [
@@ -51,7 +52,7 @@ function LandingPage() {
               Technology, Kolhapur.
             </p>
             <div className="hero-actions">
-              <button className="btn btn-primary">Get Started</button>
+              <Link to="/signup" className="btn btn-primary">Get Started</Link>
               <button className="btn btn-outline">Explore Network</button>
             </div>
           </div>
