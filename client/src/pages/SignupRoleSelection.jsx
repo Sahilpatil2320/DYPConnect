@@ -15,7 +15,7 @@ function SignupRoleSelection() {
 
     return (
         <main className="auth-page">
-            <div className="auth-card">
+            <div className="role-select-card">
                 <h1>Create Your Account</h1>
                 <p className="auth-subtext">
                     Join DYPConnect and become a part of our professional community.

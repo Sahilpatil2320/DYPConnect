@@ -18,10 +18,18 @@
 }
 
 .auth-back {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   color: var(--color-text-muted);
   font-size: 0.9rem;
-  margin-bottom: 16px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  transition: color 0.15s ease;
+}
+
+.auth-back:hover {
+  color: var(--color-primary);
 }
 
 .auth-back:hover {
@@ -100,7 +108,19 @@
   top: 50%;
   transform: translateY(-50%);
   background: none;
-  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.password-toggle:hover {
+  color: var(--color-primary);
+  background: var(--color-bg-soft);
 }
 
 .auth-submit {
