@@ -10,25 +10,31 @@ import LoginRoleSelection from "./pages/LoginRoleSelection";
 import StudentLogin from "./pages/StudentLogin";
 import TeacherLogin from "./pages/TeacherLogin";
 import AlumniLogin from "./pages/AlumniLogin";
+import Dashboard from "./pages/Dashboard";
+import { useLocation } from "react-router-dom";
+import DashboardNavbar from "./components/DashboardNavbar";
 
 function App() {
-  return (
-    <>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/signup" element={<SignupRoleSelection />} />
-        <Route path="/signup/student" element={<StudentSignup />} />
-        <Route path="/signup/teacher" element={<TeacherSignup />} />
-        <Route path="/signup/alumni" element={<AlumniSignup />} />
-        <Route path="/login" element={<LoginRoleSelection />} />
-        <Route path="/login/student" element={<StudentLogin />} />
-        <Route path="/login/teacher" element={<TeacherLogin />} />
-        <Route path="/login/alumni" element={<AlumniLogin />} />
-      </Routes>
-      <Footer />
-    </>
-  );
-}
+    const location = useLocation();
+    const isDashboardRoute = location.pathname.startsWith("/dashboard");
 
+    return (
+        <>
+            {isDashboardRoute ? <DashboardNavbar /> : <Navbar />}
+            <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/signup" element={<SignupRoleSelection />} />
+                <Route path="/signup/student" element={<StudentSignup />} />
+                <Route path="/signup/teacher" element={<TeacherSignup />} />
+                <Route path="/signup/alumni" element={<AlumniSignup />} />
+                <Route path="/login" element={<LoginRoleSelection />} />
+                <Route path="/login/student" element={<StudentLogin />} />
+                <Route path="/login/teacher" element={<TeacherLogin />} />
+                <Route path="/login/alumni" element={<AlumniLogin />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+            </Routes>
+            {!isDashboardRoute && <Footer />}
+        </>
+    );
+}
 export default App;

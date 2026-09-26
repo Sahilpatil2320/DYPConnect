@@ -179,3 +179,20 @@
 .auth-google i {
   font-size: 1.1rem;
 }
+
+.field-error {
+  color: var(--color-danger, #DC2626);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.auth-form input.input-error,
+.auth-form select.input-error {
+  border-color: #DC2626;
+}
+
+.auth-form input.input-error:focus,
+.auth-form select.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}

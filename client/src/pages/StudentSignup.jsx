@@ -1,139 +1,157 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./AuthForm.css";
+import { validateEmail, validatePassword, validateConfirmPassword, validateRequired } from "../utils/validators";
+
 
 function StudentSignup() {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    department: "",
-    year: "",
-  });
+    const [formData, setFormData] = useState({
+        fullName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        department: "",
+        year: "",
+    });
 
-  const [showPassword, setShowPassword] = useState(false);
+    const [errors, setErrors] = useState({});
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Student signup data:", formData);
-    // Backend connection comes in Phase 3 (Authentication)
-  };
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
-  return (
-    <main className="auth-page">
-      <div className="auth-card">
-        <Link to="/signup" className="auth-back">← Back</Link>
+    const validate = () => {
+        const newErrors = {
+            fullName: validateRequired(formData.fullName, "Full name"),
+            email: validateEmail(formData.email),
+            password: validatePassword(formData.password),
+            confirmPassword: validateConfirmPassword(formData.password, formData.confirmPassword),
+            department: validateRequired(formData.department, "Department"),
+            year: validateRequired(formData.year, "Year"),
+        };
+        setErrors(newErrors);
+        return Object.values(newErrors).every((err) => err === "");
+    };
 
-        <div className="auth-icon">🎓</div>
-        <h1>Student Sign Up</h1>
-        <p className="auth-subtext">Create your student account</p>
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!validate()) return;
+        console.log("Student signup data:", formData);
+        // Backend connection comes later
+    };
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <label>
-            Full Name
-            <input
-              type="text"
-              name="fullName"
-              placeholder="Enter your full name"
-              value={formData.fullName}
-              onChange={handleChange}
-              required
-            />
-          </label>
+    return (
+        <main className="auth-page">
+            <div className="auth-card">
+                <Link to="/signup" className="auth-back">← Back</Link>
 
-          <label>
-            Email Address
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </label>
+                <div className="auth-icon">🎓</div>
+                <h1>Student Sign Up</h1>
+                <p className="auth-subtext">Create your student account</p>
 
-          <label>
-            Password
-            <div className="password-wrapper">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Create a password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                <i className={showPassword ? "ti ti-eye-off" : "ti ti-eye"} aria-hidden="true"></i>
-              </button>
+                <form onSubmit={handleSubmit} className="auth-form">
+                    <label>
+                        Full Name
+                        <input
+                            type="text"
+                            name="fullName"
+                            placeholder="Enter your full name"
+                            value={formData.fullName}
+                            onChange={handleChange}
+                            required
+                        />
+                    </label>
+
+                    <label>
+                        Email Address
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Enter your email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                        />
+                    </label>
+
+                    <label>
+                        Password
+                        <div className="password-wrapper">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                placeholder="Create a password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                            />
+                            <button
+                                type="button"
+                                className="password-toggle"
+                                onClick={() => setShowPassword(!showPassword)}
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                                <i className={showPassword ? "ti ti-eye-off" : "ti ti-eye"} aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </label>
+
+                    <label>
+                        Confirm Password
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="confirmPassword"
+                            placeholder="Confirm your password"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            required
+                        />
+                    </label>
+
+                    <label>
+                        Department
+                        <select
+                            name="department"
+                            value={formData.department}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Select your department</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Civil">Civil</option>
+                            <option value="Electronics">Electronics</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Year
+                        <select
+                            name="year"
+                            value={formData.year}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Select your year</option>
+                            <option value="1">First Year</option>
+                            <option value="2">Second Year</option>
+                            <option value="3">Third Year</option>
+                            <option value="4">Fourth Year</option>
+                        </select>
+                    </label>
+
+                    <button type="submit" className="btn btn-primary auth-submit">
+                        Sign Up
+                    </button>
+                </form>
             </div>
-          </label>
-
-          <label>
-            Confirm Password
-            <input
-              type={showPassword ? "text" : "password"}
-              name="confirmPassword"
-              placeholder="Confirm your password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          <label>
-            Department
-            <select
-              name="department"
-              value={formData.department}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select your department</option>
-              <option value="Computer Science">Computer Science</option>
-              <option value="Mechanical">Mechanical</option>
-              <option value="Electrical">Electrical</option>
-              <option value="Civil">Civil</option>
-              <option value="Electronics">Electronics</option>
-            </select>
-          </label>
-
-          <label>
-            Year
-            <select
-              name="year"
-              value={formData.year}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select your year</option>
-              <option value="1">First Year</option>
-              <option value="2">Second Year</option>
-              <option value="3">Third Year</option>
-              <option value="4">Fourth Year</option>
-            </select>
-          </label>
-
-          <button type="submit" className="btn btn-primary auth-submit">
-            Sign Up
-          </button>
-        </form>
-      </div>
-    </main>
-  );
+        </main>
+    );
 }
 
 export default StudentSignup;
