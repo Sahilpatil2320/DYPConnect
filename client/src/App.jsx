@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import { useLocation } from "react-router-dom";
 import DashboardNavbar from "./components/DashboardNavbar";
 import Network from "./pages/Network";
+import Opportunities from "./pages/Opportunities";
 
 function App() {
     const location = useLocation();
@@ -35,6 +36,7 @@ function App() {
                 <Route path="/login/alumni" element={<AlumniLogin />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/network" element={<Network />} />
+                <Route path="/opportunities" element={<Opportunities />} />
             </Routes>
             {!isDashboardRoute && <Footer />}
         </>
