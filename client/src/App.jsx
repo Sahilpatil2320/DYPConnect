@@ -16,6 +16,7 @@ import DashboardNavbar from "./components/DashboardNavbar";
 import Network from "./pages/Network";
 import Opportunities from "./pages/Opportunities";
 import Messages from "./pages/Messages";
+import Notifications from "./pages/Notifications";
 
 function App() {
     const location = useLocation();
@@ -39,6 +40,7 @@ function App() {
                 <Route path="/network" element={<Network />} />
                 <Route path="/opportunities" element={<Opportunities />} />
                 <Route path="/messages" element={<Messages />} />
+                <Route path="/notifications" element={<Notifications />} />
             </Routes>
             {!isDashboardRoute && <Footer />}
         </>
