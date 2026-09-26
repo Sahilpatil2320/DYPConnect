@@ -13,10 +13,12 @@ import AlumniLogin from "./pages/AlumniLogin";
 import Dashboard from "./pages/Dashboard";
 import { useLocation } from "react-router-dom";
 import DashboardNavbar from "./components/DashboardNavbar";
+import Network from "./pages/Network";
 
 function App() {
     const location = useLocation();
-    const isDashboardRoute = location.pathname.startsWith("/dashboard");
+    const appRoutes = ["/dashboard", "/network", "/opportunities", "/messages", "/notifications"];
+    const isDashboardRoute = appRoutes.some((route) => location.pathname.startsWith(route));
 
     return (
         <>
@@ -32,6 +34,7 @@ function App() {
                 <Route path="/login/teacher" element={<TeacherLogin />} />
                 <Route path="/login/alumni" element={<AlumniLogin />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/network" element={<Network />} />
             </Routes>
             {!isDashboardRoute && <Footer />}
         </>
