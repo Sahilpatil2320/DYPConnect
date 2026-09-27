@@ -1,8 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { validateEmail, validatePassword, validateConfirmPassword, validateRequired } from "../utils/validators";
+import { registerUser } from "../utils/fakeAuth";
 import "./AuthForm.css";
 
 function AlumniSignup() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -14,16 +18,40 @@ function AlumniSignup() {
     currentRole: "",
   });
 
+  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const validate = () => {
+    const newErrors = {
+      fullName: validateRequired(formData.fullName, "Full name"),
+      email: validateEmail(formData.email),
+      password: validatePassword(formData.password),
+      confirmPassword: validateConfirmPassword(formData.password, formData.confirmPassword),
+      department: validateRequired(formData.department, "Department"),
+      graduationYear: validateRequired(formData.graduationYear, "Graduation year"),
+      currentCompany: validateRequired(formData.currentCompany, "Current company"),
+      currentRole: validateRequired(formData.currentRole, "Current role"),
+    };
+    setErrors(newErrors);
+    return Object.values(newErrors).every((err) => err === "");
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Alumni signup data:", formData);
-    // Backend connection comes in Phase 3 (Authentication)
+    if (!validate()) return;
+
+    const result = registerUser("alumni", formData);
+    if (!result.success) {
+      setSubmitError(result.message);
+      return;
+    }
+
+    navigate("/login/alumni");
   };
 
   const graduationYears = Array.from({ length: 30 }, (_, i) => 2026 - i);
@@ -37,7 +65,9 @@ function AlumniSignup() {
         <h1>Alumni Sign Up</h1>
         <p className="auth-subtext">Create your alumni account</p>
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        {submitError && <p className="field-error auth-submit-error">{submitError}</p>}
+
+        <form onSubmit={handleSubmit} className="auth-form" noValidate>
           <label>
             Full Name
             <input
@@ -46,8 +76,9 @@ function AlumniSignup() {
               placeholder="Enter your full name"
               value={formData.fullName}
               onChange={handleChange}
-              required
+              className={errors.fullName ? "input-error" : ""}
             />
+            {errors.fullName && <span className="field-error">{errors.fullName}</span>}
           </label>
 
           <label>
@@ -58,8 +89,9 @@ function AlumniSignup() {
               placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
-              required
+              className={errors.email ? "input-error" : ""}
             />
+            {errors.email && <span className="field-error">{errors.email}</span>}
           </label>
 
           <label>
@@ -71,7 +103,7 @@ function AlumniSignup() {
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={handleChange}
-                required
+                className={errors.password ? "input-error" : ""}
               />
               <button
                 type="button"
@@ -82,6 +114,7 @@ function AlumniSignup() {
                 <i className={showPassword ? "ti ti-eye-off" : "ti ti-eye"} aria-hidden="true"></i>
               </button>
             </div>
+            {errors.password && <span className="field-error">{errors.password}</span>}
           </label>
 
           <label>
@@ -92,8 +125,9 @@ function AlumniSignup() {
               placeholder="Confirm your password"
               value={formData.confirmPassword}
               onChange={handleChange}
-              required
+              className={errors.confirmPassword ? "input-error" : ""}
             />
+            {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
           </label>
 
           <label>
@@ -102,7 +136,7 @@ function AlumniSignup() {
               name="department"
               value={formData.department}
               onChange={handleChange}
-              required
+              className={errors.department ? "input-error" : ""}
             >
               <option value="">Select your department</option>
               <option value="Computer Science">Computer Science</option>
@@ -111,6 +145,7 @@ function AlumniSignup() {
               <option value="Civil">Civil</option>
               <option value="Electronics">Electronics</option>
             </select>
+            {errors.department && <span className="field-error">{errors.department}</span>}
           </label>
 
           <label>
@@ -119,13 +154,14 @@ function AlumniSignup() {
               name="graduationYear"
               value={formData.graduationYear}
               onChange={handleChange}
-              required
+              className={errors.graduationYear ? "input-error" : ""}
             >
               <option value="">Select graduation year</option>
               {graduationYears.map((year) => (
                 <option key={year} value={year}>{year}</option>
               ))}
             </select>
+            {errors.graduationYear && <span className="field-error">{errors.graduationYear}</span>}
           </label>
 
           <label>
@@ -136,8 +172,9 @@ function AlumniSignup() {
               placeholder="Enter your current company"
               value={formData.currentCompany}
               onChange={handleChange}
-              required
+              className={errors.currentCompany ? "input-error" : ""}
             />
+            {errors.currentCompany && <span className="field-error">{errors.currentCompany}</span>}
           </label>
 
           <label>
@@ -148,8 +185,9 @@ function AlumniSignup() {
               placeholder="Enter your current job title"
               value={formData.currentRole}
               onChange={handleChange}
-              required
+              className={errors.currentRole ? "input-error" : ""}
             />
+            {errors.currentRole && <span className="field-error">{errors.currentRole}</span>}
           </label>
 
           <button type="submit" className="btn btn-primary auth-submit">

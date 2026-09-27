@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./AuthForm.css";
 import { validateEmail, validatePassword, validateConfirmPassword, validateRequired } from "../utils/validators";
-
+import "./AuthForm.css";
+import { registerUser } from "../utils/fakeAuth";
 
 function StudentSignup() {
     const navigate = useNavigate();
@@ -17,7 +17,7 @@ function StudentSignup() {
     });
 
     const [errors, setErrors] = useState({});
-
+    const [submitError, setSubmitError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
@@ -40,8 +40,14 @@ function StudentSignup() {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!validate()) return;
-        console.log("Student signup data:", formData);
-        // Backend connection comes later
+
+        const result = registerUser("student", formData);
+        if (!result.success) {
+            setSubmitError(result.message);
+            return;
+        }
+
+        navigate("/login/student");
     };
 
     return (
@@ -53,7 +59,9 @@ function StudentSignup() {
                 <h1>Student Sign Up</h1>
                 <p className="auth-subtext">Create your student account</p>
 
-                <form onSubmit={handleSubmit} className="auth-form">
+
+                {submitError && <p className="field-error auth-submit-error">{submitError}</p>}
+                <form onSubmit={handleSubmit} className="auth-form" noValidate>
                     <label>
                         Full Name
                         <input
@@ -62,8 +70,9 @@ function StudentSignup() {
                             placeholder="Enter your full name"
                             value={formData.fullName}
                             onChange={handleChange}
-                            required
+                            className={errors.fullName ? "input-error" : ""}
                         />
+                        {errors.fullName && <span className="field-error">{errors.fullName}</span>}
                     </label>
 
                     <label>
@@ -74,8 +83,9 @@ function StudentSignup() {
                             placeholder="Enter your email"
                             value={formData.email}
                             onChange={handleChange}
-                            required
+                            className={errors.email ? "input-error" : ""}
                         />
+                        {errors.email && <span className="field-error">{errors.email}</span>}
                     </label>
 
                     <label>
@@ -87,7 +97,7 @@ function StudentSignup() {
                                 placeholder="Create a password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                required
+                                className={errors.password ? "input-error" : ""}
                             />
                             <button
                                 type="button"
@@ -98,6 +108,7 @@ function StudentSignup() {
                                 <i className={showPassword ? "ti ti-eye-off" : "ti ti-eye"} aria-hidden="true"></i>
                             </button>
                         </div>
+                        {errors.password && <span className="field-error">{errors.password}</span>}
                     </label>
 
                     <label>
@@ -108,8 +119,9 @@ function StudentSignup() {
                             placeholder="Confirm your password"
                             value={formData.confirmPassword}
                             onChange={handleChange}
-                            required
+                            className={errors.confirmPassword ? "input-error" : ""}
                         />
+                        {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
                     </label>
 
                     <label>
@@ -118,7 +130,7 @@ function StudentSignup() {
                             name="department"
                             value={formData.department}
                             onChange={handleChange}
-                            required
+                            className={errors.department ? "input-error" : ""}
                         >
                             <option value="">Select your department</option>
                             <option value="Computer Science">Computer Science</option>
@@ -127,6 +139,7 @@ function StudentSignup() {
                             <option value="Civil">Civil</option>
                             <option value="Electronics">Electronics</option>
                         </select>
+                        {errors.department && <span className="field-error">{errors.department}</span>}
                     </label>
 
                     <label>
@@ -135,7 +148,7 @@ function StudentSignup() {
                             name="year"
                             value={formData.year}
                             onChange={handleChange}
-                            required
+                            className={errors.year ? "input-error" : ""}
                         >
                             <option value="">Select your year</option>
                             <option value="1">First Year</option>
@@ -143,6 +156,7 @@ function StudentSignup() {
                             <option value="3">Third Year</option>
                             <option value="4">Fourth Year</option>
                         </select>
+                        {errors.year && <span className="field-error">{errors.year}</span>}
                     </label>
 
                     <button type="submit" className="btn btn-primary auth-submit">

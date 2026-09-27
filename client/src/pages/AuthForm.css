@@ -196,3 +196,9 @@
 .auth-form select.input-error:focus {
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
 }
+
+.auth-submit-error {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+}
