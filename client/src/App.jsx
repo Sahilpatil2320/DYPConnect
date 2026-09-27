@@ -13,6 +13,7 @@ import LoginRoleSelection from "./pages/auth/LoginRoleSelection";
 import StudentLogin from "./pages/auth/StudentLogin";
 import TeacherLogin from "./pages/auth/TeacherLogin";
 import AlumniLogin from "./pages/auth/AlumniLogin";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 
 import Dashboard from "./pages/app/Dashboard";
 import Network from "./pages/app/Network";
@@ -43,6 +44,7 @@ function App() {
         <Route path="/opportunities" element={<Opportunities />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
       {!isDashboardRoute && <Footer />}
     </>
