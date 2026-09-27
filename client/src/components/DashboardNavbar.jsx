@@ -1,10 +1,16 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import "./DashboardNavbar.css";
+import { getCurrentUser } from "../utils/fakeAuth";
 
 function DashboardNavbar() {
     const navigate = useNavigate();
     const location = useLocation();
+
+    const currentUser = getCurrentUser();
+    const userInitials = currentUser
+        ? currentUser.fullName.split(" ").map((n) => n[0]).join("").toUpperCase()
+        : "?";
 
     const handleLogoClick = () => {
         if (location.pathname === "/dashboard") {
@@ -67,7 +73,7 @@ function DashboardNavbar() {
                     </nav>
 
                     <div className="dash-profile-menu">
-                        <div className="dash-avatar">SP</div>
+                        <div className="dash-avatar">{userInitials}</div>
                     </div>
                 </div>
             </div>
