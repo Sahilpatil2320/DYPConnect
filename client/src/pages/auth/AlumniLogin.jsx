@@ -1,18 +1,41 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { loginUser } from "../../utils/fakeAuth";
+import { validateEmail, validateRequired } from "../../utils/validators";
 import "./AuthForm.css";
 
 function AlumniLogin() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const validate = () => {
+    const newErrors = {
+      email: validateEmail(formData.email),
+      password: validateRequired(formData.password, "Password"),
+    };
+    setErrors(newErrors);
+    return Object.values(newErrors).every((err) => err === "");
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Alumni login data:", formData);
+    setSubmitError("");
+    if (!validate()) return;
+
+    const result = loginUser("alumni", formData.email, formData.password);
+    if (!result.success) {
+      setSubmitError(result.message);
+      return;
+    }
+
+    navigate("/dashboard");
   };
 
   return (
@@ -24,7 +47,9 @@ function AlumniLogin() {
         <h1>Alumni Login</h1>
         <p className="auth-subtext">Welcome back! Please login to continue.</p>
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        {submitError && <p className="field-error auth-submit-error">{submitError}</p>}
+
+        <form onSubmit={handleSubmit} className="auth-form" noValidate>
           <label>
             Email Address
             <input
@@ -33,8 +58,9 @@ function AlumniLogin() {
               placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
-              required
+              className={errors.email ? "input-error" : ""}
             />
+            {errors.email && <span className="field-error">{errors.email}</span>}
           </label>
 
           <label>
@@ -46,7 +72,7 @@ function AlumniLogin() {
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={handleChange}
-                required
+                className={errors.password ? "input-error" : ""}
               />
               <button
                 type="button"
@@ -57,6 +83,7 @@ function AlumniLogin() {
                 <i className={showPassword ? "ti ti-eye-off" : "ti ti-eye"} aria-hidden="true"></i>
               </button>
             </div>
+            {errors.password && <span className="field-error">{errors.password}</span>}
           </label>
 
           <p className="auth-forgot">

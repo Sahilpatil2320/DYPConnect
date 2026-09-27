@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { validateEmail, validatePassword, validateConfirmPassword, validateRequired } from "../utils/validators";
+import { validateEmail, validatePassword, validateConfirmPassword, validateRequired } from "../../utils/validators";
 import "./AuthForm.css";
-import { registerUser } from "../utils/fakeAuth";
+import { registerUser } from "../../utils/fakeAuth";
 
 function StudentSignup() {
     const navigate = useNavigate();

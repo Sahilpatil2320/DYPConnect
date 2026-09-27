@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { validateEmail, validatePassword, validateConfirmPassword, validateRequired } from "../utils/validators";
-import { registerUser } from "../utils/fakeAuth";
+import { validateEmail, validatePassword, validateConfirmPassword, validateRequired } from "../../utils/validators";
+import { registerUser } from "../../utils/fakeAuth";
 import "./AuthForm.css";
 
 function AlumniSignup() {
