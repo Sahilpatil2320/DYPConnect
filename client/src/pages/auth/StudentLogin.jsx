@@ -10,6 +10,7 @@ function StudentLogin() {
     const [errors, setErrors] = useState({});
     const [submitError, setSubmitError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [googleNotice, setGoogleNotice] = useState("");
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -97,10 +98,14 @@ function StudentLogin() {
 
                 <div className="auth-divider">or</div>
 
-                <button className="btn btn-outline auth-google">
+                <button
+                    type="button"
+                    className="btn btn-outline auth-google"
+                    onClick={() => setGoogleNotice("Google login will be available once our backend is connected. Please use email and password for now.")}>
                     <i className="ti ti-brand-google" aria-hidden="true"></i>
                     Login with Google
                 </button>
+                {googleNotice && <p className="auth-google-notice">{googleNotice}</p>}
 
                 <p className="auth-footer-text">
                     Don't have an account? <Link to="/signup">Sign Up</Link>
