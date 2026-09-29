@@ -2,6 +2,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import "./DashboardNavbar.css";
 import { getCurrentUser } from "../utils/fakeAuth";
+import { logoutUser } from "../utils/fakeAuth";
+import { useState } from "react";
 
 function DashboardNavbar() {
     const navigate = useNavigate();
@@ -11,6 +13,13 @@ function DashboardNavbar() {
     const userInitials = currentUser
         ? currentUser.fullName.split(" ").map((n) => n[0]).join("").toUpperCase()
         : "?";
+
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    const handleLogout = () => {
+        logoutUser();
+        navigate("/");
+    };
 
     const handleLogoClick = () => {
         if (location.pathname === "/dashboard") {
@@ -73,7 +82,24 @@ function DashboardNavbar() {
                     </nav>
 
                     <div className="dash-profile-menu">
-                        <div className="dash-avatar">{userInitials}</div>
+                        <button
+                            className="dash-avatar"
+                            onClick={() => setMenuOpen(!menuOpen)}
+                            aria-label="Open profile menu"
+                        >
+                            {userInitials}
+                        </button>
+                        {menuOpen && (
+                            <div className="dash-dropdown">
+                                <p className="dash-dropdown-name">{currentUser?.fullName}</p>
+                                <p className="dash-dropdown-role">{currentUser?.role}</p>
+                                <hr className="dash-dropdown-divider" />
+                                <button className="dash-dropdown-item" onClick={handleLogout}>
+                                    <i className="ti ti-logout" aria-hidden="true"></i>
+                                    Log Out
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

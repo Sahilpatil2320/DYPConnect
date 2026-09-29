@@ -4,16 +4,7 @@ import { getCurrentUser } from "../../utils/fakeAuth";
 import "./Dashboard.css";
 
 function Dashboard() {
-    const navigate = useNavigate();
-    const currentUser = getCurrentUser();
-
-    useEffect(() => {
-        if (!currentUser) {
-            navigate("/login");
-        }
-    }, [currentUser, navigate]);
-
-    if (!currentUser) return null;
+  const currentUser = getCurrentUser();
 
     const roleLabels = {
         student: "Student",

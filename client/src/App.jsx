@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import DashboardNavbar from "./components/DashboardNavbar";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import LandingPage from "./pages/LandingPage";
 
@@ -39,11 +40,11 @@ function App() {
         <Route path="/login/student" element={<StudentLogin />} />
         <Route path="/login/teacher" element={<TeacherLogin />} />
         <Route path="/login/alumni" element={<AlumniLogin />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/network" element={<Network />} />
-        <Route path="/opportunities" element={<Opportunities />} />
-        <Route path="/messages" element={<Messages />} />
-        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/network" element={<ProtectedRoute><Network /></ProtectedRoute>} />
+        <Route path="/opportunities" element={<ProtectedRoute><Opportunities /></ProtectedRoute>} />
+        <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
       {!isDashboardRoute && <Footer />}
