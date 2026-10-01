@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getCurrentUser } from "../../utils/fakeAuth";
+import { getCurrentUser } from "../../utils/auth";
 import "./Dashboard.css";
 
 function Dashboard() {

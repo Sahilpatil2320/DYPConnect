@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../../utils/fakeAuth";
+import { loginUser } from "../../utils/auth";
 import { validateEmail, validateRequired } from "../../utils/validators";
 import "./AuthForm.css";
 
@@ -25,12 +25,12 @@ function TeacherLogin() {
         return Object.values(newErrors).every((err) => err === "");
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitError("");
         if (!validate()) return;
 
-        const result = loginUser("teacher", formData.email, formData.password);
+        const result = await loginUser("teacher", formData.email, formData.password);
         if (!result.success) {
             setSubmitError(result.message);
             return;

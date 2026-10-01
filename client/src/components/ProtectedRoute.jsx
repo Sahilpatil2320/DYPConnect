@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { getCurrentUser } from "../utils/fakeAuth";
+import { getCurrentUser } from "../utils/auth";
 
 function ProtectedRoute({ children }) {
   const currentUser = getCurrentUser();

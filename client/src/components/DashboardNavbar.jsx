@@ -1,7 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import "./DashboardNavbar.css";
-import { getCurrentUser } from "../utils/fakeAuth";
+import { getCurrentUser } from "../utils/auth";
 import { logoutUser } from "../utils/fakeAuth";
 import { useState } from "react";
 

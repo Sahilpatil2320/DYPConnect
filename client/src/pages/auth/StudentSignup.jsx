@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { validateEmail, validatePassword, validateConfirmPassword, validateRequired } from "../../utils/validators";
 import "./AuthForm.css";
-import { registerUser } from "../../utils/fakeAuth";
+import { registerUser } from "../../utils/auth";
 
 function StudentSignup() {
     const navigate = useNavigate();
@@ -37,11 +37,11 @@ function StudentSignup() {
         return Object.values(newErrors).every((err) => err === "");
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validate()) return;
 
-        const result = registerUser("student", formData);
+        const result = await registerUser("student", formData);
         if (!result.success) {
             setSubmitError(result.message);
             return;
