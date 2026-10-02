@@ -4,15 +4,14 @@ import "./DashboardNavbar.css";
 import { getCurrentUser } from "../utils/auth";
 import { logoutUser } from "../utils/fakeAuth";
 import { useState } from "react";
+import { getInitials } from "../utils/getInitials";
 
 function DashboardNavbar() {
     const navigate = useNavigate();
     const location = useLocation();
 
     const currentUser = getCurrentUser();
-    const userInitials = currentUser
-        ? currentUser.fullName.split(" ").map((n) => n[0]).join("").toUpperCase()
-        : "?";
+    const userInitials = currentUser ? getInitials(currentUser.fullName) : "?";
 
     const [menuOpen, setMenuOpen] = useState(false);
 

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getCurrentUser } from "../../utils/auth";
 import api from "../../utils/api";
 import "./Dashboard.css";
+import { getInitials } from "../../utils/getInitials";
 
 function Dashboard() {
     const currentUser = getCurrentUser();
@@ -27,6 +28,7 @@ function Dashboard() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [newPostText, setNewPostText] = useState("");
+    const [showPostModal, setShowPostModal] = useState(false);
     const [posting, setPosting] = useState(false);
     const [openCommentId, setOpenCommentId] = useState(null);
     const [commentDrafts, setCommentDrafts] = useState({});
@@ -114,7 +116,7 @@ function Dashboard() {
                 <aside className="dashboard-left">
                     <div className="profile-card">
                         <div className="profile-avatar">
-                            {user.name.split(" ").map((n) => n[0]).join("").toUpperCase()}
+                            {getInitials(user.name)}
                         </div>
                         <h3 className="profile-name">{user.name}</h3>
                         <p className="profile-role">{user.role} · {user.department}</p>
@@ -134,19 +136,59 @@ function Dashboard() {
                 </aside>
 
                 <main className="dashboard-feed">
-                    <form className="create-post-box" onSubmit={handleCreatePost}>
+                    <div className="create-post-box" onClick={() => setShowPostModal(true)}>
                         <div className="post-avatar-small">
-                            {user.name.split(" ").map((n) => n[0]).join("").toUpperCase()}
+                            {getInitials(user.name)}
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Share an update, achievement or opportunity..."
-                            className="create-post-input"
-                            value={newPostText}
-                            onChange={(e) => setNewPostText(e.target.value)}
-                            disabled={posting}
-                        />
-                    </form>
+                        <div className="create-post-input">
+                            Share an update, achievement or opportunity...
+                        </div>
+                    </div>
+
+                    {showPostModal && (
+                        <div className="post-modal-overlay" onClick={() => setShowPostModal(false)}>
+                            <div className="post-modal" onClick={(e) => e.stopPropagation()}>
+                                <div className="post-modal-header">
+                                    <h3>Create a post</h3>
+                                    <button className="post-modal-close" onClick={() => setShowPostModal(false)}>
+                                        <i className="ti ti-x" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+
+                                <div className="post-modal-user">
+                                    <div className="post-avatar-small">
+                                        {user.name.split(" ").map((n) => n[0]).join("").toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="post-author">{user.name}</p>
+                                        <p className="post-meta">{user.role} · {user.department}</p>
+                                    </div>
+                                </div>
+
+                                <form onSubmit={handleCreatePost}>
+                                    <textarea
+                                        className="post-modal-textarea"
+                                        placeholder="What do you want to talk about?"
+                                        value={newPostText}
+                                        onChange={(e) => setNewPostText(e.target.value)}
+                                        disabled={posting}
+                                        autoFocus
+                                        rows={6}
+                                    />
+                                    <div className="post-modal-footer">
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                            disabled={posting || !newPostText.trim()}
+                                            onClick={() => setShowPostModal(false)}
+                                        >
+                                            {posting ? "Posting..." : "Post"}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
 
                     {loading && <p className="feed-refreshing">Loading feed...</p>}
 
@@ -157,7 +199,7 @@ function Dashboard() {
                                 <div className="post-card" key={post._id}>
                                     <div className="post-header">
                                         <div className="post-avatar-small">
-                                            {post.author?.fullName?.split(" ").map((n) => n[0]).join("").toUpperCase() || "?"}
+                                            {getInitials(post.author?.fullName)}
                                         </div>
                                         <div>
                                             <p className="post-author">{post.author?.fullName || "Unknown"}</p>
