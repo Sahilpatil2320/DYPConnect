@@ -1,152 +1,148 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "../../utils/api";
+import { getInitials } from "../../utils/getInitials";
 import "./Notifications.css";
 
 function Notifications() {
-  const [activeFilter, setActiveFilter] = useState("all");
+    const [activeFilter, setActiveFilter] = useState("all");
+    const [notifications, setNotifications] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  const initialNotifications = [
-    {
-      id: 1,
-      type: "connection",
-      icon: "ti-user-plus",
-      initials: "OR",
-      text: "Om Raut sent you a connection request",
-      time: "10 minutes ago",
-      unread: true,
-    },
-    {
-      id: 2,
-      type: "like",
-      icon: "ti-thumb-up",
-      initials: "AD",
-      text: "Prof. Anjali Deshmukh liked your post",
-      time: "1 hour ago",
-      unread: true,
-    },
-    {
-      id: 3,
-      type: "comment",
-      icon: "ti-message-circle",
-      initials: "RS",
-      text: "Rohan Shinde commented on your post: \"Great initiative!\"",
-      time: "3 hours ago",
-      unread: true,
-    },
-    {
-      id: 4,
-      type: "event",
-      icon: "ti-calendar-event",
-      initials: null,
-      text: "Reminder: AI/ML Bootcamp starts in 2 days",
-      time: "5 hours ago",
-      unread: false,
-    },
-    {
-      id: 5,
-      type: "connection",
-      icon: "ti-user-check",
-      initials: "PK",
-      text: "Priya Kulkarni accepted your connection request",
-      time: "1 day ago",
-      unread: false,
-    },
-    {
-      id: 6,
-      type: "opportunity",
-      icon: "ti-briefcase",
-      initials: null,
-      text: "New internship posted: Frontend Developer Intern at Zeta Technologies",
-      time: "2 days ago",
-      unread: false,
-    },
-  ];
+    const typeToFilter = {
+        like: "like",
+        comment: "comment",
+        connection_request: "connection",
+        connection_accepted: "connection",
+    };
 
-  const [notifications, setNotifications] = useState(initialNotifications);
+    const typeIcon = {
+        like: "ti-thumb-up",
+        comment: "ti-message-circle",
+        connection_request: "ti-user-plus",
+        connection_accepted: "ti-user-check",
+    };
 
-  const filters = [
-    { id: "all", label: "All" },
-    { id: "connection", label: "Connections" },
-    { id: "like", label: "Likes" },
-    { id: "comment", label: "Comments" },
-    { id: "event", label: "Events" },
-    { id: "opportunity", label: "Opportunities" },
-  ];
+    const filters = [
+        { id: "all", label: "All" },
+        { id: "connection", label: "Connections" },
+        { id: "like", label: "Likes" },
+        { id: "comment", label: "Comments" },
+    ];
 
-  const filteredNotifications =
-    activeFilter === "all"
-      ? notifications
-      : notifications.filter((n) => n.type === activeFilter);
+    const fetchNotifications = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get("/notifications");
+            setNotifications(res.data);
+        } catch (err) {
+            console.error("Failed to load notifications:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const unreadCount = notifications.filter((n) => n.unread).length;
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
 
-  const markAsRead = (id) => {
-    setNotifications(
-      notifications.map((n) => (n.id === id ? { ...n, unread: false } : n))
-    );
-  };
+    const filteredNotifications =
+        activeFilter === "all"
+            ? notifications
+            : notifications.filter((n) => typeToFilter[n.type] === activeFilter);
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, unread: false })));
-  };
+    const unreadCount = notifications.filter((n) => !n.read).length;
 
-  return (
-    <div className="notifications-page">
-      <div className="notifications-container">
-        <div className="notifications-top">
-          <div>
-            <h1 className="notifications-heading">Notifications</h1>
-            <p className="notifications-subheading">
-              {unreadCount > 0 ? `${unreadCount} unread` : "You're all caught up"}
-            </p>
-          </div>
-          {unreadCount > 0 && (
-            <button className="mark-all-read-btn" onClick={markAllAsRead}>
-              Mark all as read
-            </button>
-          )}
-        </div>
+    const markAsRead = async (id) => {
+        try {
+            await api.put(`/notifications/${id}/read`);
+            setNotifications(notifications.map((n) => (n._id === id ? { ...n, read: true } : n)));
+            window.dispatchEvent(new Event("notificationsUpdated"));
+        } catch (err) {
+            console.error("Failed to mark as read:", err);
+        }
+    };
 
-        <div className="notifications-filters">
-          {filters.map((f) => (
-            <button
-              key={f.id}
-              className={`filter-chip ${activeFilter === f.id ? "filter-chip-active" : ""}`}
-              onClick={() => setActiveFilter(f.id)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+    const markAllAsRead = async () => {
+        try {
+            await api.put("/notifications/read-all");
+            setNotifications(notifications.map((n) => ({ ...n, read: true })));
+            window.dispatchEvent(new Event("notificationsUpdated"));
+        } catch (err) {
+            console.error("Failed to mark all as read:", err);
+        }
+    };
 
-        <div className="notifications-list">
-          {filteredNotifications.map((n) => (
-            <button
-              key={n.id}
-              className={`notification-item ${n.unread ? "notification-item-unread" : ""}`}
-              onClick={() => markAsRead(n.id)}
-            >
-              {n.initials ? (
-                <div className="post-avatar-small">{n.initials}</div>
-              ) : (
-                <div className="notification-icon-circle">
-                  <i className={`ti ${n.icon}`} aria-hidden="true"></i>
+    const timeAgo = (dateStr) => {
+        const diffMs = Date.now() - new Date(dateStr).getTime();
+        const mins = Math.floor(diffMs / 60000);
+        if (mins < 1) return "Just now";
+        if (mins < 60) return `${mins}m ago`;
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return `${hrs}h ago`;
+        return `${Math.floor(hrs / 24)}d ago`;
+    };
+
+    return (
+        <div className="notifications-page">
+            <div className="notifications-container">
+                <div className="notifications-top">
+                    <div>
+                        <h1 className="notifications-heading">Notifications</h1>
+                        <p className="notifications-subheading">
+                            {unreadCount > 0 ? `${unreadCount} unread` : "You're all caught up"}
+                        </p>
+                    </div>
+                    {unreadCount > 0 && (
+                        <button className="mark-all-read-btn" onClick={markAllAsRead}>
+                            Mark all as read
+                        </button>
+                    )}
                 </div>
-              )}
-              <div className="notification-info">
-                <p className="notification-text">{n.text}</p>
-                <p className="notification-time">{n.time}</p>
-              </div>
-              {n.unread && <span className="unread-dot"></span>}
-            </button>
-          ))}
 
-          {filteredNotifications.length === 0 && (
-            <p className="notifications-empty">No notifications here yet.</p>
-          )}
+                <div className="notifications-filters">
+                    {filters.map((f) => (
+                        <button
+                            key={f.id}
+                            className={`filter-chip ${activeFilter === f.id ? "filter-chip-active" : ""}`}
+                            onClick={() => setActiveFilter(f.id)}
+                        >
+                            {f.label}
+                        </button>
+                    ))}
+                </div>
+
+                {loading && <p className="notifications-empty">Loading...</p>}
+
+                <div className="notifications-list">
+                    {!loading &&
+                        filteredNotifications.map((n) => (
+                            <button
+                                key={n._id}
+                                className={`notification-item ${!n.read ? "notification-item-unread" : ""}`}
+                                onClick={() => markAsRead(n._id)}
+                            >
+                                {n.sender ? (
+                                    <div className="post-avatar-small">{getInitials(n.sender.fullName)}</div>
+                                ) : (
+                                    <div className="notification-icon-circle">
+                                        <i className={`ti ${typeIcon[n.type] || "ti-bell"}`} aria-hidden="true"></i>
+                                    </div>
+                                )}
+                                <div className="notification-info">
+                                    <p className="notification-text">{n.text}</p>
+                                    <p className="notification-time">{timeAgo(n.createdAt)}</p>
+                                </div>
+                                {!n.read && <span className="unread-dot"></span>}
+                            </button>
+                        ))}
+
+                    {!loading && filteredNotifications.length === 0 && (
+                        <p className="notifications-empty">No notifications here yet.</p>
+                    )}
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default Notifications;

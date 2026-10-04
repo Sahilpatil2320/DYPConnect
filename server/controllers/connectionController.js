@@ -1,4 +1,6 @@
 const Connection = require("../models/Connection");
+const createNotification = require("../utils/createNotification");
+const User = require("../models/User");
 
 exports.sendRequest = async (req, res) => {
     try {
@@ -17,6 +19,14 @@ exports.sendRequest = async (req, res) => {
         const connection = await Connection.create({
             requester: req.userId,
             recipient: recipientId,
+        });
+
+        const requester = await User.findById(req.userId).select("fullName");
+        await createNotification({
+            recipient: recipientId,
+            sender: req.userId,
+            type: "connection_request",
+            text: `${requester.fullName} sent you a connection request`,
         });
 
         res.status(201).json(connection);
@@ -50,6 +60,16 @@ exports.respondToRequest = async (req, res) => {
 
         connection.status = action === "accept" ? "accepted" : "rejected";
         await connection.save();
+
+        if (action === "accept") {
+            const accepter = await User.findById(req.userId).select("fullName");
+            await createNotification({
+                recipient: connection.requester,
+                sender: req.userId,
+                type: "connection_accepted",
+                text: `${accepter.fullName} accepted your connection request`,
+            });
+        }
 
         res.json(connection);
     } catch (err) {

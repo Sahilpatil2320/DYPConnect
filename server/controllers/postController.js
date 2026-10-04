@@ -1,4 +1,5 @@
 const Post = require("../models/Post");
+const createNotification = require("../utils/createNotification");
 
 exports.createPost = async (req, res) => {
     try {
@@ -27,7 +28,7 @@ exports.getFeed = async (req, res) => {
 
 exports.toggleLike = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id);
+        const post = await Post.findById(req.params.id).populate("author", "fullName");
         if (!post) return res.status(404).json({ message: "Post not found." });
 
         const alreadyLiked = post.likes.includes(req.userId);
@@ -35,6 +36,13 @@ exports.toggleLike = async (req, res) => {
             post.likes = post.likes.filter((id) => id.toString() !== req.userId);
         } else {
             post.likes.push(req.userId);
+            const liker = await require("../models/User").findById(req.userId).select("fullName");
+            await createNotification({
+                recipient: post.author._id,
+                sender: req.userId,
+                type: "like",
+                text: `${liker.fullName} liked your post`,
+            });
         }
 
         await post.save();
@@ -53,6 +61,15 @@ exports.addComment = async (req, res) => {
         await post.save();
 
         const populated = await post.populate("comments.author", "fullName");
+
+        const commenter = await require("../models/User").findById(req.userId).select("fullName");
+        await createNotification({
+            recipient: post.author,
+            sender: req.userId,
+            type: "comment",
+            text: `${commenter.fullName} commented on your post: "${req.body.text.slice(0, 40)}${req.body.text.length > 40 ? "..." : ""}"`,
+        });
+
         res.status(201).json(populated.comments);
     } catch (err) {
         res.status(500).json({ message: "Error adding comment.", error: err.message });
