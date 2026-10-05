@@ -1,12 +1,19 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { getCurrentUser } from "../../utils/auth";
+import { Link, useNavigate } from "react-router-dom";
+import { getCurrentUser, logoutUser } from "../../utils/auth";
 import api from "../../utils/api";
 import "./Dashboard.css";
 import { getInitials } from "../../utils/getInitials";
 
+
 function Dashboard() {
     const currentUser = getCurrentUser();
+    const navigate = useNavigate();
+
+    const handleLogoutClick = () => {
+        logoutUser();
+        navigate("/");
+    };
 
     const roleLabels = { student: "Student", teacher: "Teacher", alumni: "Alumni" };
 
@@ -132,6 +139,49 @@ function Dashboard() {
                                 <span className="stat-label">Profile Views</span>
                             </div>
                         </div>
+
+                        <hr className="sidebar-shortcut-divider" />
+
+                        <Link to={`/profile/${currentUser._id}`} className="sidebar-shortcut-item">
+                            <i className="ti ti-user" aria-hidden="true"></i>
+                            View Profile
+                        </Link>
+                        <hr className="sidebar-shortcut-divider" />
+
+                        <Link to="/network" className="sidebar-shortcut-item">
+                            <i className="ti ti-users" aria-hidden="true"></i>
+                            My Connections
+                        </Link>
+                        <hr className="sidebar-shortcut-divider" />
+
+                        <Link to="/daily-challenge" className="sidebar-shortcut-item">
+                            <i className="ti ti-flame" aria-hidden="true"></i>
+                            Daily Challenge
+                        </Link>
+                        <hr className="sidebar-shortcut-divider" />
+
+                        <button className="sidebar-shortcut-item" disabled>
+                            <i className="ti ti-settings" aria-hidden="true"></i>
+                            Settings
+                        </button>
+                        <hr className="sidebar-shortcut-divider" />
+
+                        <button className="sidebar-shortcut-item" disabled>
+                            <i className="ti ti-moon" aria-hidden="true"></i>
+                            Dark Mode
+                        </button>
+                        <hr className="sidebar-shortcut-divider" />
+
+                        <button className="sidebar-shortcut-item" disabled>
+                            <i className="ti ti-help-circle" aria-hidden="true"></i>
+                            Help & Support
+                        </button>
+                        <hr className="sidebar-shortcut-divider" />
+
+                        <button className="sidebar-shortcut-item sidebar-shortcut-logout" onClick={handleLogoutClick}>
+                            <i className="ti ti-logout" aria-hidden="true"></i>
+                            Log Out
+                        </button>
                     </div>
                 </aside>
 

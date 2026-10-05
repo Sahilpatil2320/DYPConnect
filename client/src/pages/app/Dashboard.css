@@ -79,7 +79,6 @@
 .profile-stats {
     display: flex;
     justify-content: space-around;
-    border-top: 1px solid var(--color-border);
     padding-top: 14px;
 }
 
@@ -417,4 +416,59 @@
     padding: 16px 20px;
     border-top: 1px solid var(--color-border);
     margin-top: 12px;
+}
+
+.sidebar-shortcuts {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 10px;
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: none;
+    color: var(--color-text);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 4px;
+    border-radius: 6px;
+    text-align: left;
+}
+
+.sidebar-shortcut-item i {
+    font-size: 1rem;
+    width: 18px;
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+}
+
+.sidebar-shortcut-item:not(:disabled):hover {
+    background: var(--color-bg-soft);
+}
+
+.sidebar-shortcut-item:disabled {
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.sidebar-shortcut-divider {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 6px 0;
+}
+
+.sidebar-shortcut-logout {
+    color: #DC2626;
+}
+
+.sidebar-shortcut-logout:hover {
+    background: #FEE2E2;
 }
