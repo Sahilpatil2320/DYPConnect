@@ -45,6 +45,18 @@ function Opportunities() {
         fetchListings();
     }, []);
 
+    useEffect(() => {
+        const markVisited = async () => {
+            try {
+                await api.put("/opportunities/mark-visited");
+                window.dispatchEvent(new Event("badgesUpdated"));
+            } catch (err) {
+                console.error("Failed to mark opportunities as visited:", err);
+            }
+        };
+        markVisited();
+    }, []);
+
     const filteredListings =
         activeFilter === "all" ? listings : listings.filter((item) => item.type === activeFilter);
 

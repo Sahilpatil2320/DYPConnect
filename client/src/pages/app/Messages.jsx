@@ -40,6 +40,7 @@ function Messages() {
 		try {
 			const res = await api.get(`/chat/messages/${conv._id}`);
 			setMessages(res.data);
+			window.dispatchEvent(new Event("badgesUpdated"));
 		} catch (err) {
 			console.error("Failed to load messages:", err);
 		}

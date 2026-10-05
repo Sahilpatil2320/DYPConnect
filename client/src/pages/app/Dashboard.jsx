@@ -73,6 +73,18 @@ function Dashboard() {
         fetchStreak();
     }, []);
 
+    useEffect(() => {
+        const markVisited = async () => {
+            try {
+                await api.put("/posts/mark-visited");
+                window.dispatchEvent(new Event("badgesUpdated"));
+            } catch (err) {
+                console.error("Failed to mark feed as visited:", err);
+            }
+        };
+        markVisited();
+    }, []);
+
     const handleCreatePost = async (e) => {
         e.preventDefault();
         if (!newPostText.trim()) return;
