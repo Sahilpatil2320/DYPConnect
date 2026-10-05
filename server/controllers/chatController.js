@@ -38,8 +38,32 @@ exports.getMessages = async (req, res) => {
         const messages = await Message.find({ conversation: req.params.conversationId })
             .populate("sender", "fullName")
             .sort({ createdAt: 1 });
+
+        await Message.updateMany(
+            { conversation: req.params.conversationId, sender: { $ne: req.userId }, read: false },
+            { read: true }
+        );
+
         res.json(messages);
     } catch (err) {
         res.status(500).json({ message: "Error fetching messages.", error: err.message });
+    }
+};
+
+exports.getUnreadMessageCount = async (req, res) => {
+    try {
+        const Message = require("../models/Message");
+        const conversations = await Conversation.find({ participants: req.userId });
+        const conversationIds = conversations.map((c) => c._id);
+
+        const count = await Message.countDocuments({
+            conversation: { $in: conversationIds },
+            sender: { $ne: req.userId },
+            read: false,
+        });
+
+        res.json({ count });
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching unread count.", error: err.message });
     }
 };

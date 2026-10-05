@@ -42,3 +42,26 @@ exports.applyToOpportunity = async (req, res) => {
         res.status(500).json({ message: "Error applying.", error: err.message });
     }
 };
+
+const User = require("../models/User");
+
+exports.getNewOpportunitiesCount = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        const count = await Opportunity.countDocuments({
+            createdAt: { $gt: user.lastVisitedOpportunities },
+        });
+        res.json({ count });
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching count.", error: err.message });
+    }
+};
+
+exports.markOpportunitiesVisited = async (req, res) => {
+    try {
+        await User.findByIdAndUpdate(req.userId, { lastVisitedOpportunities: new Date() });
+        res.json({ message: "Marked as visited." });
+    } catch (err) {
+        res.status(500).json({ message: "Error marking visited.", error: err.message });
+    }
+};

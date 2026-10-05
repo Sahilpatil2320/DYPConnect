@@ -203,6 +203,17 @@
     line-height: 1;
 }
 
+.dash-dot {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    border: 2px solid white;
+}
+
 .dash-dropdown {
     position: absolute;
     top: 46px;
@@ -238,8 +249,14 @@
 }
 
 .dash-dropdown-name-text {
+    display: block;
     font-weight: 700;
     font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+.dash-dropdown-name-text:hover {
+    color: var(--color-primary);
 }
 
 .dash-dropdown-role {

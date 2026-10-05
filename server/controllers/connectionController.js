@@ -95,3 +95,28 @@ exports.getMyConnections = async (req, res) => {
         res.status(500).json({ message: "Error fetching connections.", error: err.message });
     }
 };
+
+exports.getPendingInvitationsCount = async (req, res) => {
+    try {
+        const count = await Connection.countDocuments({ recipient: req.userId, status: "pending" });
+        res.json({ count });
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching count.", error: err.message });
+    }
+};
+
+exports.getRecentlyAccepted = async (req, res) => {
+    try {
+        const recent = await Connection.find({
+            requester: req.userId,
+            status: "accepted",
+        })
+            .populate("recipient", "fullName role department designation currentCompany")
+            .sort({ updatedAt: -1 })
+            .limit(5);
+
+        res.json(recent);
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching recent activity.", error: err.message });
+    }
+};

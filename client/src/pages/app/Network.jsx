@@ -22,6 +22,9 @@ function Network() {
     const [connections, setConnections] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sentIds, setSentIds] = useState([]);
+    const [recentActivity, setRecentActivity] = useState([]);
+    const [dismissedActivity, setDismissedActivity] = useState([]);
+    const [showAllActivity, setShowAllActivity] = useState(false);
 
     const roleLabels = { student: "Student", teacher: "Teacher", alumni: "Alumni" };
 
@@ -36,14 +39,16 @@ function Network() {
     const loadAll = async () => {
         setLoading(true);
         try {
-            const [suggestionsRes, invitationsRes, connectionsRes] = await Promise.all([
+            const [suggestionsRes, invitationsRes, connectionsRes, activityRes] = await Promise.all([
                 api.get("/users/suggestions"),
                 api.get("/connections/invitations"),
                 api.get("/connections"),
+                api.get("/connections/recent-activity"),
             ]);
             setSuggestions(suggestionsRes.data);
             setInvitations(invitationsRes.data);
             setConnections(connectionsRes.data);
+            setRecentActivity(activityRes.data);
         } catch (err) {
             console.error("Failed to load network data:", err);
         } finally {
@@ -149,6 +154,73 @@ function Network() {
                                     <span>No pending invitations</span>
                                 </div>
                             )}
+
+                            {(() => {
+                                const visibleActivity = recentActivity.filter(
+                                    (a) => !dismissedActivity.includes(a._id)
+                                );
+                                if (visibleActivity.length === 0) return null;
+
+                                const [first, ...rest] = visibleActivity;
+                                const itemsToShow = showAllActivity ? visibleActivity : [first];
+
+                                const handleDismiss = (id) => setDismissedActivity([...dismissedActivity, id]);
+
+                                return (
+                                    <div className="invitations-card">
+                                        <h4 className="sidebar-heading">Recent Activity</h4>
+                                        <div className="activity-list">
+                                            {!showAllActivity && (
+                                                <div className="activity-item">
+                                                    <div className="suggestion-avatar">{getInitials(first.recipient.fullName)}</div>
+                                                    <p className="activity-line">
+                                                        <strong>{first.recipient.fullName}</strong>
+                                                        {rest.length > 0 && (
+                                                            <>
+                                                                {" "}and{" "}
+                                                                <button className="activity-others-link" onClick={() => setShowAllActivity(true)}>
+                                                                    {rest.length} other{rest.length > 1 ? "s" : ""}
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                        {" "}accepted your connection request{rest.length > 0 ? "s" : ""} —{" "}
+                                                        <button className="activity-message-link" onClick={() => handleMessage(first.recipient._id)}>
+                                                            message
+                                                        </button>
+                                                    </p>
+                                                    <button
+                                                        className="activity-dismiss"
+                                                        onClick={() => handleDismiss(first._id)}
+                                                        aria-label="Dismiss"
+                                                    >
+                                                        <i className="ti ti-x" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {showAllActivity &&
+                                                itemsToShow.map((activity) => (
+                                                    <div className="activity-item" key={activity._id}>
+                                                        <div className="suggestion-avatar">{getInitials(activity.recipient.fullName)}</div>
+                                                        <p className="activity-line">
+                                                            <strong>{activity.recipient.fullName}</strong> accepted your connection request —{" "}
+                                                            <button className="activity-message-link" onClick={() => handleMessage(activity.recipient._id)}>
+                                                                message
+                                                            </button>
+                                                        </p>
+                                                        <button
+                                                            className="activity-dismiss"
+                                                            onClick={() => handleDismiss(activity._id)}
+                                                            aria-label="Dismiss"
+                                                        >
+                                                            <i className="ti ti-x" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
 
                             <div className="suggestions-card">
                                 <h4 className="sidebar-heading">People You May Know</h4>

@@ -16,7 +16,9 @@ const userSchema = new mongoose.Schema(
         skills: [{ type: String }],
         currentStreak: { type: Number, default: 0 },
         longestStreak: { type: Number, default: 0 },
-        lastAnsweredDate: { type: String }, // stored as "YYYY-MM-DD"
+        lastAnsweredDate: { type: String },
+        lastVisitedOpportunities: { type: Date, default: Date.now },
+        lastVisitedFeed: { type: Date, default: Date.now },
     },
     { timestamps: true }
 );

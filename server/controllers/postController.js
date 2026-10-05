@@ -75,3 +75,27 @@ exports.addComment = async (req, res) => {
         res.status(500).json({ message: "Error adding comment.", error: err.message });
     }
 };
+
+const User = require("../models/User");
+
+exports.getNewPostsExist = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        const newPost = await Post.findOne({
+            createdAt: { $gt: user.lastVisitedFeed },
+            author: { $ne: req.userId },
+        });
+        res.json({ hasNew: !!newPost });
+    } catch (err) {
+        res.status(500).json({ message: "Error checking new posts.", error: err.message });
+    }
+};
+
+exports.markFeedVisited = async (req, res) => {
+    try {
+        await User.findByIdAndUpdate(req.userId, { lastVisitedFeed: new Date() });
+        res.json({ message: "Marked as visited." });
+    } catch (err) {
+        res.status(500).json({ message: "Error marking visited.", error: err.message });
+    }
+};

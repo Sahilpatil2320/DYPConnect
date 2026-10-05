@@ -14,7 +14,11 @@ function DashboardNavbar() {
     const userInitials = currentUser ? getInitials(currentUser.fullName) : "?";
 
     const [menuOpen, setMenuOpen] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0);
+    const [unreadNotifications, setUnreadNotifications] = useState(0);
+    const [unreadMessages, setUnreadMessages] = useState(0);
+    const [newOpportunities, setNewOpportunities] = useState(0);
+    const [hasNewPosts, setHasNewPosts] = useState(false);
+    const [pendingInvitations, setPendingInvitations] = useState(0);
 
     const handleLogout = () => {
         logoutUser();
@@ -31,23 +35,35 @@ function DashboardNavbar() {
 
     const closeMenu = () => setMenuOpen(false);
 
-    useEffect(() => {
-        const fetchUnreadCount = async () => {
-            try {
-                const res = await api.get("/notifications/unread-count");
-                setUnreadCount(res.data.count);
-            } catch (err) {
-                console.error("Failed to fetch unread count:", err);
-            }
-        };
+    const fetchAllBadges = async () => {
+        try {
+            const [notifRes, msgRes, oppRes, feedRes, invitesRes] = await Promise.all([
+                api.get("/notifications/unread-count"),
+                api.get("/chat/unread-count"),
+                api.get("/opportunities/unseen-count"),
+                api.get("/posts/unseen-check"),
+                api.get("/connections/invitations-count"),
+            ]);
+            setUnreadNotifications(notifRes.data.count);
+            setUnreadMessages(msgRes.data.count);
+            setNewOpportunities(oppRes.data.count);
+            setHasNewPosts(feedRes.data.hasNew);
+            setPendingInvitations(invitesRes.data.count);
+        } catch (err) {
+            console.error("Failed to fetch badge counts:", err);
+        }
+    };
 
-        fetchUnreadCount();
-        const interval = setInterval(fetchUnreadCount, 15000);
-        window.addEventListener("notificationsUpdated", fetchUnreadCount);
+    useEffect(() => {
+        fetchAllBadges();
+        const interval = setInterval(fetchAllBadges, 15000);
+        window.addEventListener("notificationsUpdated", fetchAllBadges);
+        window.addEventListener("badgesUpdated", fetchAllBadges);
 
         return () => {
             clearInterval(interval);
-            window.removeEventListener("notificationsUpdated", fetchUnreadCount);
+            window.removeEventListener("notificationsUpdated", fetchAllBadges);
+            window.removeEventListener("badgesUpdated", fetchAllBadges);
         };
     }, []);
 
@@ -69,28 +85,46 @@ function DashboardNavbar() {
                             to="/dashboard"
                             className={`dash-tab ${location.pathname === "/dashboard" ? "dash-tab-active" : ""}`}
                         >
-                            <i className="ti ti-home" aria-hidden="true"></i>
+                            <span className="dash-tab-icon-wrapper">
+                                <i className="ti ti-home" aria-hidden="true"></i>
+                                {hasNewPosts && <span className="dash-dot"></span>}
+                            </span>
                             <span>Home</span>
                         </Link>
                         <Link
                             to="/network"
                             className={`dash-tab ${location.pathname === "/network" ? "dash-tab-active" : ""}`}
                         >
-                            <i className="ti ti-users" aria-hidden="true"></i>
+                            <span className="dash-tab-icon-wrapper">
+                                <i className="ti ti-users" aria-hidden="true"></i>
+                                {pendingInvitations > 0 && (
+                                    <span className="dash-badge">{pendingInvitations > 9 ? "9+" : pendingInvitations}</span>
+                                )}
+                            </span>
                             <span>My Network</span>
                         </Link>
                         <Link
                             to="/opportunities"
                             className={`dash-tab ${location.pathname === "/opportunities" ? "dash-tab-active" : ""}`}
                         >
-                            <i className="ti ti-briefcase" aria-hidden="true"></i>
+                            <span className="dash-tab-icon-wrapper">
+                                <i className="ti ti-briefcase" aria-hidden="true"></i>
+                                {newOpportunities > 0 && (
+                                    <span className="dash-badge">{newOpportunities > 9 ? "9+" : newOpportunities}</span>
+                                )}
+                            </span>
                             <span>Opportunities</span>
                         </Link>
                         <Link
                             to="/messages"
                             className={`dash-tab ${location.pathname === "/messages" ? "dash-tab-active" : ""}`}
                         >
-                            <i className="ti ti-message-circle" aria-hidden="true"></i>
+                            <span className="dash-tab-icon-wrapper">
+                                <i className="ti ti-message-circle" aria-hidden="true"></i>
+                                {unreadMessages > 0 && (
+                                    <span className="dash-badge">{unreadMessages > 9 ? "9+" : unreadMessages}</span>
+                                )}
+                            </span>
                             <span>Messaging</span>
                         </Link>
                         <Link
@@ -99,8 +133,8 @@ function DashboardNavbar() {
                         >
                             <span className="dash-tab-icon-wrapper">
                                 <i className="ti ti-bell" aria-hidden="true"></i>
-                                {unreadCount > 0 && (
-                                    <span className="dash-badge">{unreadCount > 9 ? "9+" : unreadCount}</span>
+                                {unreadNotifications > 0 && (
+                                    <span className="dash-badge">{unreadNotifications > 9 ? "9+" : unreadNotifications}</span>
                                 )}
                             </span>
                             <span>Notifications</span>
@@ -121,7 +155,9 @@ function DashboardNavbar() {
                                 <div className="dash-dropdown-preview">
                                     <div className="dash-dropdown-avatar">{userInitials}</div>
                                     <div>
-                                        <p className="dash-dropdown-name-text">{currentUser?.fullName}</p>
+                                        <Link to={`/profile/${currentUser?._id}`} className="dash-dropdown-name-text" onClick={closeMenu}>
+                                            {currentUser?.fullName}
+                                        </Link>
                                         <p className="dash-dropdown-role">{currentUser?.role}</p>
                                     </div>
                                 </div>
