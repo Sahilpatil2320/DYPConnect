@@ -39,6 +39,7 @@ function Dashboard() {
     const [posting, setPosting] = useState(false);
     const [openCommentId, setOpenCommentId] = useState(null);
     const [commentDrafts, setCommentDrafts] = useState({});
+    const [streak, setStreak] = useState(0);
 
     const fetchFeed = async () => {
         setLoading(true);
@@ -58,6 +59,18 @@ function Dashboard() {
         const handleRefresh = () => fetchFeed();
         window.addEventListener("refreshFeed", handleRefresh);
         return () => window.removeEventListener("refreshFeed", handleRefresh);
+    }, []);
+
+    useEffect(() => {
+        const fetchStreak = async () => {
+            try {
+                const res = await api.get("/challenge/streak");
+                setStreak(res.data.currentStreak);
+            } catch (err) {
+                console.error("Failed to fetch streak:", err);
+            }
+        };
+        fetchStreak();
     }, []);
 
     const handleCreatePost = async (e) => {
@@ -155,8 +168,9 @@ function Dashboard() {
                         <hr className="sidebar-shortcut-divider" />
 
                         <Link to="/daily-challenge" className="sidebar-shortcut-item">
-                            <i className="ti ti-flame" aria-hidden="true"></i>
+                            <i className={`ti ti-flame ${streak > 0 ? "streak-icon-active" : ""}`} aria-hidden="true"></i>
                             Daily Challenge
+                            {streak > 0 && <span className="sidebar-streak-count">{streak}</span>}
                         </Link>
                         <hr className="sidebar-shortcut-divider" />
 

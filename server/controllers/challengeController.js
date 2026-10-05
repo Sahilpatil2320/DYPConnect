@@ -96,3 +96,12 @@ exports.submitAnswer = async (req, res) => {
         res.status(500).json({ message: "Error submitting answer.", error: err.message });
     }
 };
+
+exports.getStreak = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select("currentStreak longestStreak");
+        res.json({ currentStreak: user.currentStreak, longestStreak: user.longestStreak });
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching streak.", error: err.message });
+    }
+};
