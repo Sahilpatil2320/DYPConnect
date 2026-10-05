@@ -14,6 +14,9 @@ const userSchema = new mongoose.Schema(
         currentRole: { type: String },
         bio: { type: String, default: "" },
         skills: [{ type: String }],
+        currentStreak: { type: Number, default: 0 },
+        longestStreak: { type: Number, default: 0 },
+        lastAnsweredDate: { type: String }, // stored as "YYYY-MM-DD"
     },
     { timestamps: true }
 );

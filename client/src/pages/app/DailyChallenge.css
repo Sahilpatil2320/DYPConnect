@@ -13,7 +13,7 @@
     border-radius: 16px;
     padding: 48px 40px;
     text-align: center;
-    max-width: 440px;
+    max-width: 560px;
 }
 
 .daily-challenge-icon {
@@ -42,4 +42,109 @@
     font-size: 0.8rem;
     padding: 6px 16px;
     border-radius: 16px;
+}
+
+.streak-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.streak-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.streak-num {
+    font-size: 1.3rem;
+    font-weight: 800;
+}
+
+.streak-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+.daily-challenge-question {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.daily-challenge-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.daily-option {
+    text-align: left;
+    border: 1.5px solid var(--color-border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: white;
+    color: var(--color-text);
+}
+
+.daily-option:not(:disabled):hover {
+    border-color: var(--color-primary-light);
+}
+
+.daily-option-selected {
+    border-color: var(--color-primary);
+    background: var(--color-bg-soft);
+}
+
+.daily-option-correct {
+    border-color: #16A34A;
+    background: #DCFCE7;
+    color: #166534;
+}
+
+.daily-option-wrong {
+    border-color: #DC2626;
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.daily-submit-btn {
+    width: 100%;
+}
+
+.daily-result {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    text-align: left;
+}
+
+.daily-result-correct {
+    background: #DCFCE7;
+    color: #166534;
+}
+
+.daily-result-wrong {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.daily-result-headline {
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.daily-result-explanation {
+    font-size: 0.85rem;
+    line-height: 1.5;
 }
