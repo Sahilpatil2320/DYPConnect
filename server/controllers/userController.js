@@ -22,3 +22,28 @@ exports.getSuggestions = async (req, res) => {
         res.status(500).json({ message: "Error fetching suggestions.", error: err.message });
     }
 };
+
+exports.getProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select("-password");
+        if (!user) return res.status(404).json({ message: "User not found." });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching profile.", error: err.message });
+    }
+};
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const allowedFields = ["fullName", "bio", "skills", "department", "year", "designation", "currentCompany", "currentRole"];
+        const updates = {};
+        allowedFields.forEach((field) => {
+            if (req.body[field] !== undefined) updates[field] = req.body[field];
+        });
+
+        const user = await User.findByIdAndUpdate(req.userId, updates, { new: true }).select("-password");
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ message: "Error updating profile.", error: err.message });
+    }
+};

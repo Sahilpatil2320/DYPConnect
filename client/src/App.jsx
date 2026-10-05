@@ -21,35 +21,39 @@ import Network from "./pages/app/Network";
 import Opportunities from "./pages/app/Opportunities";
 import Messages from "./pages/app/Messages";
 import Notifications from "./pages/app/Notifications";
+import Profile from "./pages/app/Profile";
+import DailyChallenge from "./pages/app/DailyChallenge";
 
 function App() {
-  const location = useLocation();
-  const appRoutes = ["/dashboard", "/network", "/opportunities", "/messages", "/notifications"];
-  const isDashboardRoute = appRoutes.some((route) => location.pathname.startsWith(route));
+    const location = useLocation();
+    const appRoutes = ["/dashboard", "/network", "/opportunities", "/messages", "/notifications", "/profile", "/daily-challenge"];
+    const isDashboardRoute = appRoutes.some((route) => location.pathname.startsWith(route));
 
-  return (
-    <>
-      {isDashboardRoute ? <DashboardNavbar /> : <Navbar />}
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/signup" element={<SignupRoleSelection />} />
-        <Route path="/signup/student" element={<StudentSignup />} />
-        <Route path="/signup/teacher" element={<TeacherSignup />} />
-        <Route path="/signup/alumni" element={<AlumniSignup />} />
-        <Route path="/login" element={<LoginRoleSelection />} />
-        <Route path="/login/student" element={<StudentLogin />} />
-        <Route path="/login/teacher" element={<TeacherLogin />} />
-        <Route path="/login/alumni" element={<AlumniLogin />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/network" element={<ProtectedRoute><Network /></ProtectedRoute>} />
-        <Route path="/opportunities" element={<ProtectedRoute><Opportunities /></ProtectedRoute>} />
-        <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-      </Routes>
-      {!isDashboardRoute && <Footer />}
-    </>
-  );
+    return (
+        <>
+            {isDashboardRoute ? <DashboardNavbar /> : <Navbar />}
+            <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/signup" element={<SignupRoleSelection />} />
+                <Route path="/signup/student" element={<StudentSignup />} />
+                <Route path="/signup/teacher" element={<TeacherSignup />} />
+                <Route path="/signup/alumni" element={<AlumniSignup />} />
+                <Route path="/login" element={<LoginRoleSelection />} />
+                <Route path="/login/student" element={<StudentLogin />} />
+                <Route path="/login/teacher" element={<TeacherLogin />} />
+                <Route path="/login/alumni" element={<AlumniLogin />} />
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/network" element={<ProtectedRoute><Network /></ProtectedRoute>} />
+                <Route path="/opportunities" element={<ProtectedRoute><Opportunities /></ProtectedRoute>} />
+                <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+                <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+                <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/daily-challenge" element={<ProtectedRoute><DailyChallenge /></ProtectedRoute>} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+            </Routes>
+            {!isDashboardRoute && <Footer />}
+        </>
+    );
 }
 
 export default App;
