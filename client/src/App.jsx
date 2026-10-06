@@ -23,10 +23,11 @@ import Messages from "./pages/app/Messages";
 import Notifications from "./pages/app/Notifications";
 import Profile from "./pages/app/Profile";
 import DailyChallenge from "./pages/app/DailyChallenge";
+import Leaderboard from "./pages/app/Leaderboard";
 
 function App() {
     const location = useLocation();
-    const appRoutes = ["/dashboard", "/network", "/opportunities", "/messages", "/notifications", "/profile", "/daily-challenge"];
+    const appRoutes = ["/dashboard", "/network", "/opportunities", "/messages", "/notifications", "/profile", "/daily-challenge", "/leaderboard"];
     const isDashboardRoute = appRoutes.some((route) => location.pathname.startsWith(route));
 
     return (
@@ -49,6 +50,7 @@ function App() {
                 <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
                 <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/daily-challenge" element={<ProtectedRoute><DailyChallenge /></ProtectedRoute>} />
+                <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
             </Routes>
             {!isDashboardRoute && <Footer />}

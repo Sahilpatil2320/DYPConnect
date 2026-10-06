@@ -1,0 +1,128 @@
+.leaderboard-page {
+    background: var(--color-bg-soft);
+    min-height: calc(100vh - 64px);
+    padding: 24px;
+}
+
+.leaderboard-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.leaderboard-header {
+    text-align: center;
+    margin: 20px 0 24px;
+}
+
+.leaderboard-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.leaderboard-subtext {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.leaderboard-scope-toggle {
+    display: flex;
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 20px;
+}
+
+.scope-btn {
+    flex: 1;
+    background: none;
+    padding: 10px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    border-radius: 8px;
+}
+
+.scope-btn-active {
+    background: var(--color-primary);
+    color: white;
+}
+
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+}
+
+.leaderboard-item-top {
+    border-color: #FBBF24;
+    background: #FFFBEB;
+}
+
+.leaderboard-item-me {
+    border-color: var(--color-primary);
+    background: var(--color-bg-soft);
+}
+
+.leaderboard-rank {
+    font-size: 1.1rem;
+    font-weight: 800;
+    width: 32px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.leaderboard-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.leaderboard-name {
+    font-weight: 700;
+    font-size: 0.92rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.leaderboard-you-tag {
+    background: var(--color-primary);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.leaderboard-dept {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+}
+
+.leaderboard-streak {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.leaderboard-streak-num {
+    font-weight: 800;
+    font-size: 1rem;
+}
+
+.leaderboard-streak-label {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+}
