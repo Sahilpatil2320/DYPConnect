@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import api from "../../utils/api";
 import "./DailyChallenge.css";
 
@@ -7,12 +8,16 @@ function DailyChallenge() {
     const [question, setQuestion] = useState(null);
     const [alreadyAnswered, setAlreadyAnswered] = useState(false);
     const [wasCorrect, setWasCorrect] = useState(null);
+    const [timedOut, setTimedOut] = useState(false);
     const [currentStreak, setCurrentStreak] = useState(0);
     const [longestStreak, setLongestStreak] = useState(0);
     const [selectedOption, setSelectedOption] = useState(null);
     const [submitting, setSubmitting] = useState(false);
     const [result, setResult] = useState(null);
     const [noQuestions, setNoQuestions] = useState(false);
+    const [elapsedSeconds, setElapsedSeconds] = useState(null);
+    const timerRef = useRef(null);
+    const TIME_LIMIT_SECONDS = 5 * 60;
 
     const fetchToday = async () => {
         setLoading(true);
@@ -24,8 +29,12 @@ function DailyChallenge() {
                 setQuestion(res.data.question);
                 setAlreadyAnswered(res.data.alreadyAnswered);
                 setWasCorrect(res.data.wasCorrect);
+                setTimedOut(res.data.timedOut || false);
                 setCurrentStreak(res.data.currentStreak);
                 setLongestStreak(res.data.longestStreak);
+                if (!res.data.alreadyAnswered) {
+                    setElapsedSeconds(res.data.elapsedSeconds);
+                }
             }
         } catch (err) {
             console.error("Failed to load today's question:", err);
@@ -36,7 +45,37 @@ function DailyChallenge() {
 
     useEffect(() => {
         fetchToday();
+
+        return () => {
+            api.post("/challenge/pause").catch((err) => {
+                console.error("Failed to pause timer:", err);
+            });
+        };
     }, []);
+
+    useEffect(() => {
+        if (elapsedSeconds === null || alreadyAnswered || result) return;
+
+        if (elapsedSeconds >= TIME_LIMIT_SECONDS) {
+            handleTimeout();
+            return;
+        }
+
+        timerRef.current = setTimeout(() => {
+            setElapsedSeconds((s) => s + 1);
+        }, 1000);
+
+        return () => clearTimeout(timerRef.current);
+    }, [elapsedSeconds, alreadyAnswered, result]);
+
+    const handleTimeout = async () => {
+        setSubmitting(true);
+        try {
+            await fetchToday();
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     const handleSubmit = async () => {
         if (selectedOption === null) return;
@@ -51,11 +90,25 @@ function DailyChallenge() {
             setLongestStreak(res.data.longestStreak);
             setAlreadyAnswered(true);
         } catch (err) {
-            console.error("Failed to submit answer:", err);
+            if (err.response?.data?.timedOut) {
+                setTimedOut(true);
+                setAlreadyAnswered(true);
+                setCurrentStreak(0);
+            } else {
+                console.error("Failed to submit answer:", err);
+            }
         } finally {
             setSubmitting(false);
         }
     };
+
+    const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, "0")}`;
+    };
+
+    const isLowTime = elapsedSeconds !== null && elapsedSeconds >= TIME_LIMIT_SECONDS - 60;
 
     if (loading) {
         return (
@@ -93,7 +146,15 @@ function DailyChallenge() {
                     </div>
                 </div>
 
-                <h1>Question of the Day</h1>
+                <div className="daily-challenge-header">
+                    <h1>Question of the Day</h1>
+                    {!alreadyAnswered && !result && elapsedSeconds !== null && (
+                        <div className={`daily-timer ${isLowTime ? "daily-timer-low" : ""}`}>
+                            <i className="ti ti-clock" aria-hidden="true"></i>
+                            {formatTime(elapsedSeconds)} / 5:00
+                        </div>
+                    )}
+                </div>
 
                 <p className="daily-challenge-question">{question.questionText}</p>
 
@@ -116,7 +177,7 @@ function DailyChallenge() {
                                 key={idx}
                                 className={optionClass}
                                 onClick={() => !alreadyAnswered && !result && setSelectedOption(idx)}
-                                disabled={alreadyAnswered || !!result}
+                                disabled={alreadyAnswered || !!result || timedOut}
                             >
                                 {opt}
                             </button>
@@ -124,7 +185,7 @@ function DailyChallenge() {
                     })}
                 </div>
 
-                {!alreadyAnswered && !result && (
+                {!alreadyAnswered && !result && !timedOut && (
                     <button
                         className="btn btn-primary daily-submit-btn"
                         onClick={handleSubmit}
@@ -137,19 +198,33 @@ function DailyChallenge() {
                 {result && (
                     <div className={`daily-result ${result.isCorrect ? "daily-result-correct" : "daily-result-wrong"}`}>
                         <p className="daily-result-headline">
-                            {result.isCorrect ? "Correct! 🎉" : "Not quite — see the explanation below."}
+                            {result.isCorrect ? "Correct! Streak continues! 🎉" : "Not quite — your streak has reset."}
                         </p>
                         {result.explanation && <p className="daily-result-explanation">{result.explanation}</p>}
                     </div>
                 )}
 
-                {alreadyAnswered && !result && (
+                {timedOut && !result && (
+                    <div className="daily-result daily-result-wrong">
+                        <p className="daily-result-headline">
+                            Time's up! You didn't answer within 5 minutes — your streak has reset.
+                        </p>
+                        <p className="daily-result-explanation">Come back tomorrow for a new question.</p>
+                    </div>
+                )}
+
+                {alreadyAnswered && !result && !timedOut && (
                     <div className={`daily-result ${wasCorrect ? "daily-result-correct" : "daily-result-wrong"}`}>
                         <p className="daily-result-headline">
-                            You already answered today's question — {wasCorrect ? "and got it right! 🎉" : "come back tomorrow for a new one."}
+                            You already answered today's question — {wasCorrect ? "and got it right! 🎉" : "better luck tomorrow."}
                         </p>
                     </div>
                 )}
+
+                <Link to="/leaderboard" className="daily-leaderboard-link">
+                    <i className="ti ti-trophy" aria-hidden="true"></i>
+                    View Leaderboard
+                </Link>
             </div>
         </div>
     );
