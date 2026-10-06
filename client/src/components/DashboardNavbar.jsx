@@ -5,6 +5,7 @@ import { getCurrentUser, logoutUser } from "../utils/auth";
 import { getInitials } from "../utils/getInitials";
 import { useState, useEffect } from "react";
 import api from "../utils/api";
+import SearchBar from "./SearchBar";
 
 function DashboardNavbar() {
     const navigate = useNavigate();
@@ -74,10 +75,7 @@ function DashboardNavbar() {
                     <img src={logo} alt="DYPConnect logo" className="dash-logo-icon" />
                 </button>
 
-                <div className="dash-search">
-                    <i className="ti ti-search" aria-hidden="true"></i>
-                    <input type="text" placeholder="Search people, posts, opportunities..." readOnly />
-                </div>
+                <SearchBar />
 
                 <div className="dash-right-group">
                     <nav className="dash-tabs">

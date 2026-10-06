@@ -47,3 +47,21 @@ exports.updateProfile = async (req, res) => {
         res.status(500).json({ message: "Error updating profile.", error: err.message });
     }
 };
+
+exports.searchUsers = async (req, res) => {
+    try {
+        const query = req.query.q || "";
+        if (!query.trim()) return res.json([]);
+
+        const users = await User.find({
+            _id: { $ne: req.userId },
+            fullName: { $regex: query, $options: "i" },
+        })
+            .select("fullName role department designation graduationYear currentCompany bio")
+            .limit(8);
+
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ message: "Error searching users.", error: err.message });
+    }
+};

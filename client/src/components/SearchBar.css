@@ -1,0 +1,134 @@
+.dash-search-wrapper {
+    position: relative;
+    flex: 0 1 280px;
+}
+
+.search-clear-btn {
+    background: none;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    padding: 2px;
+    flex-shrink: 0;
+}
+
+.search-clear-btn:hover {
+    color: var(--color-text);
+}
+
+.search-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 70;
+}
+
+.search-dropdown-header {
+    padding: 10px 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.search-history-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    cursor: pointer;
+}
+
+.search-history-item:hover {
+    background: var(--color-bg-soft);
+}
+
+.search-history-item i:first-child {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.search-history-text {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--color-text);
+}
+
+.search-history-remove {
+    background: none;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    padding: 4px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.search-history-remove:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
+.search-dropdown-loading,
+.search-dropdown-empty {
+    padding: 16px 14px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+.search-result-item:hover {
+    background: var(--color-bg-soft);
+}
+
+.search-result-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.search-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-result-name {
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.search-result-role {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+}
+
+.search-result-bio {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
