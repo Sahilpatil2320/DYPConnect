@@ -4,6 +4,7 @@ import { getCurrentUser, logoutUser } from "../../utils/auth";
 import api from "../../utils/api";
 import "./Dashboard.css";
 import { getInitials } from "../../utils/getInitials";
+import { getTheme, toggleTheme } from "../../utils/theme";
 
 
 function Dashboard() {
@@ -40,7 +41,13 @@ function Dashboard() {
     const [openCommentId, setOpenCommentId] = useState(null);
     const [commentDrafts, setCommentDrafts] = useState({});
     const [streak, setStreak] = useState(0);
+    const [isDark, setIsDark] = useState(getTheme() === "dark");
 
+    useEffect(() => {
+        const handleThemeChange = () => setIsDark(getTheme() === "dark");
+        window.addEventListener("themeChanged", handleThemeChange);
+        return () => window.removeEventListener("themeChanged", handleThemeChange);
+    }, []);
     const fetchFeed = async () => {
         setLoading(true);
         try {
@@ -51,6 +58,11 @@ function Dashboard() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleToggleDarkMode = () => {
+        const newTheme = toggleTheme();
+        setIsDark(newTheme === "dark");
     };
 
     useEffect(() => {
@@ -192,9 +204,9 @@ function Dashboard() {
                         </button>
                         <hr className="sidebar-shortcut-divider" />
 
-                        <button className="sidebar-shortcut-item" disabled>
-                            <i className="ti ti-moon" aria-hidden="true"></i>
-                            Dark Mode
+                        <button className="sidebar-shortcut-item" onClick={handleToggleDarkMode}>
+                            <i className={`ti ${isDark ? "ti-sun" : "ti-moon"}`} aria-hidden="true"></i>
+                            {isDark ? "Light Mode" : "Dark Mode"}
                         </button>
                         <hr className="sidebar-shortcut-divider" />
 

@@ -23,6 +23,12 @@ function DashboardNavbar() {
     const [pendingInvitations, setPendingInvitations] = useState(0);
     const [isDark, setIsDark] = useState(getTheme() === "dark");
 
+    useEffect(() => {
+        const handleThemeChange = () => setIsDark(getTheme() === "dark");
+        window.addEventListener("themeChanged", handleThemeChange);
+        return () => window.removeEventListener("themeChanged", handleThemeChange);
+    }, []);
+    
     const handleLogout = () => {
         logoutUser();
         navigate("/");
