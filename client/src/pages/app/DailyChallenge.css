@@ -8,7 +8,7 @@
 }
 
 .daily-challenge-card {
-    background: white;
+    background: var(--color-surface);;
     border: 1px solid var(--color-border);
     border-radius: 16px;
     padding: 48px 40px;
@@ -92,7 +92,7 @@
     padding: 12px 16px;
     font-size: 0.9rem;
     font-weight: 500;
-    background: white;
+    background: var(--color-surface);;
     color: var(--color-text);
 }
 

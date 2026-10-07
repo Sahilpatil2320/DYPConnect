@@ -16,14 +16,14 @@
 
 .dashboard-left,
 .dashboard-right {
-    background: white;
+    background: var(--color-surface);;
     border: 1px solid var(--color-border);
     border-radius: 12px;
     padding: 20px;
 }
 
 .dashboard-feed {
-    background: white;
+    background: var(--color-surface);;
     border: 1px solid var(--color-border);
     border-radius: 12px;
     padding: 20px;
@@ -356,7 +356,7 @@
 }
 
 .post-modal {
-    background: white;
+    background: var(--color-surface);;
     border-radius: 12px;
     width: 100%;
     max-width: 540px;
@@ -419,7 +419,7 @@
 }
 
 .sidebar-shortcuts {
-    background: white;
+    background: var(--color-surface);;
     border: 1px solid var(--color-border);
     border-radius: 12px;
     padding: 10px;

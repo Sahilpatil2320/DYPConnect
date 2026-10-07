@@ -6,6 +6,7 @@ import { getInitials } from "../utils/getInitials";
 import { useState, useEffect } from "react";
 import api from "../utils/api";
 import SearchBar from "./SearchBar";
+import { getTheme, toggleTheme } from "../utils/theme";
 
 function DashboardNavbar() {
     const navigate = useNavigate();
@@ -20,10 +21,16 @@ function DashboardNavbar() {
     const [newOpportunities, setNewOpportunities] = useState(0);
     const [hasNewPosts, setHasNewPosts] = useState(false);
     const [pendingInvitations, setPendingInvitations] = useState(0);
+    const [isDark, setIsDark] = useState(getTheme() === "dark");
 
     const handleLogout = () => {
         logoutUser();
         navigate("/");
+    };
+
+    const handleToggleDarkMode = () => {
+        const newTheme = toggleTheme();
+        setIsDark(newTheme === "dark");
     };
 
     const handleLogoClick = () => {
@@ -181,9 +188,9 @@ function DashboardNavbar() {
                                     <i className="ti ti-settings" aria-hidden="true"></i>
                                     Settings
                                 </button>
-                                <button className="dash-dropdown-item" disabled>
-                                    <i className="ti ti-moon" aria-hidden="true"></i>
-                                    Dark Mode
+                                <button className="dash-dropdown-item" onClick={handleToggleDarkMode}>
+                                    <i className={`ti ${isDark ? "ti-sun" : "ti-moon"}`} aria-hidden="true"></i>
+                                    {isDark ? "Light Mode" : "Dark Mode"}
                                 </button>
                                 <button className="dash-dropdown-item" disabled>
                                     <i className="ti ti-help-circle" aria-hidden="true"></i>

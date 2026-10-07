@@ -8,7 +8,7 @@
 }
 
 .role-select-card {
-  background: white;
+  background: var(--color-surface);;
   border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 40px;
@@ -43,7 +43,7 @@
 }
 
 .role-card {
-  background: white;
+  background: var(--color-surface);;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius);
   padding: 20px 12px;
