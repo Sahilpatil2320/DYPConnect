@@ -74,6 +74,7 @@
 
 .notification-item-unread {
     background: var(--color-bg-soft);
+    border-left: 3px solid var(--color-primary);
 }
 
 .notification-icon-circle {
