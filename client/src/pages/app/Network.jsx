@@ -10,8 +10,8 @@ function Network() {
 
     const handleMessage = async (userId) => {
         try {
-            await api.post("/chat/conversations", { recipientId: userId });
-            navigate("/messages");
+            const res = await api.post("/chat/conversations", { recipientId: userId });
+            navigate("/messages", { state: { conversationId: res.data._id } });
         } catch (err) {
             console.error("Failed to start conversation:", err);
         }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import api from "../../utils/api";
 import { getCurrentUser } from "../../utils/auth";
 import { getInitials } from "../../utils/getInitials";
@@ -7,69 +8,97 @@ import "./Messages.css";
 
 function Messages() {
 	const currentUser = getCurrentUser();
+	const location = useLocation();
+	const requestedConversationId = location.state?.conversationId;
+
 	const [conversations, setConversations] = useState([]);
 	const [activeConversation, setActiveConversation] = useState(null);
 	const [messages, setMessages] = useState([]);
 	const [draft, setDraft] = useState("");
 	const [loading, setLoading] = useState(true);
-	const [typingUser, setTypingUser] = useState("");
-	const typingTimeoutRef = useRef(null);
+	const [typingInfo, setTypingInfo] = useState(null);
+
+	// A ref always holds the CURRENT open chat, even inside long-lived socket handlers
+	const activeIdRef = useRef(null);
+	const typingClearRef = useRef(null);
+	const lastTypingEmitRef = useRef(0);
 	const messagesEndRef = useRef(null);
 
 	const getOtherParticipant = (conv) =>
 		conv.participants.find((p) => p._id !== currentUser._id);
 
-	const loadConversations = async () => {
-		setLoading(true);
+	const refreshConversations = async () => {
 		try {
 			const res = await api.get("/chat/conversations");
 			setConversations(res.data);
-			if (res.data.length > 0 && !activeConversation) {
-				selectConversation(res.data[0]);
-			}
+			return res.data;
 		} catch (err) {
 			console.error("Failed to load conversations:", err);
-		} finally {
-			setLoading(false);
+			return [];
 		}
 	};
 
 	const selectConversation = async (conv) => {
+		activeIdRef.current = conv._id;
 		setActiveConversation(conv);
-		socket.emit("joinConversation", conv._id);
+		setMessages([]);
 		try {
 			const res = await api.get(`/chat/messages/${conv._id}`);
-			setMessages(res.data);
+			if (activeIdRef.current === conv._id) setMessages(res.data);
 			window.dispatchEvent(new Event("badgesUpdated"));
 		} catch (err) {
 			console.error("Failed to load messages:", err);
 		}
 	};
 
+	// Load the conversation list once and open the right chat
+	useEffect(() => {
+		const init = async () => {
+			const list = await refreshConversations();
+			const target = list.find((c) => c._id === requestedConversationId) || list[0];
+			if (target) await selectConversation(target);
+			setLoading(false);
+		};
+		init();
+	}, []);
+
+	// Live updates
 	useEffect(() => {
 		socket.connect();
-		socket.emit("register", currentUser._id);
 
-		socket.on("newMessage", (message) => {
-			setMessages((prev) => {
-				if (activeConversation && message.conversation === activeConversation._id) {
-					return [...prev, message];
+		const handleNewMessage = (message) => {
+			const fromMe = message.sender._id === currentUser._id;
+			const isOpenChat = activeIdRef.current === message.conversation;
+
+			if (isOpenChat) {
+				setMessages((prev) =>
+					prev.some((m) => m._id === message._id) ? prev : [...prev, message]
+				);
+				if (!fromMe) {
+					socket.emit("markRead", { conversationId: message.conversation }, () => {
+						window.dispatchEvent(new Event("badgesUpdated"));
+					});
 				}
-				return prev;
-			});
-			loadConversations();
-		});
+			} else if (!fromMe) {
+				window.dispatchEvent(new Event("badgesUpdated"));
+			}
 
-		socket.on("userTyping", (userName) => {
-			setTypingUser(userName);
-			setTimeout(() => setTypingUser(""), 2000);
-		});
+			refreshConversations();
+		};
 
-		loadConversations();
+		const handleUserTyping = ({ conversationId, userName }) => {
+			setTypingInfo({ conversationId, userName });
+			clearTimeout(typingClearRef.current);
+			typingClearRef.current = setTimeout(() => setTypingInfo(null), 2000);
+		};
+
+		socket.on("newMessage", handleNewMessage);
+		socket.on("userTyping", handleUserTyping);
 
 		return () => {
-			socket.off("newMessage");
-			socket.off("userTyping");
+			socket.off("newMessage", handleNewMessage);
+			socket.off("userTyping", handleUserTyping);
+			clearTimeout(typingClearRef.current);
 			socket.disconnect();
 		};
 	}, []);
@@ -84,19 +113,20 @@ function Messages() {
 
 		socket.emit("sendMessage", {
 			conversationId: activeConversation._id,
-			text: draft,
-			senderId: currentUser._id,
+			text: draft.trim(),
 		});
 
 		setDraft("");
 	};
 
-	const handleTyping = () => {
+	const handleDraftChange = (e) => {
+		setDraft(e.target.value);
 		if (!activeConversation) return;
-		socket.emit("typing", {
-			conversationId: activeConversation._id,
-			userName: currentUser.fullName,
-		});
+
+		const now = Date.now();
+		if (now - lastTypingEmitRef.current < 1500) return;
+		lastTypingEmitRef.current = now;
+		socket.emit("typing", { conversationId: activeConversation._id });
 	};
 
 	const formatTime = (dateStr) => {
@@ -121,7 +151,7 @@ function Messages() {
 
 					{conversations.length === 0 && (
 						<p className="notifications-empty">
-							No conversations yet. Connect with someone first, then start a chat from their profile.
+							No conversations yet. Connect with someone first, then start a chat from My Network.
 						</p>
 					)}
 
@@ -157,7 +187,8 @@ function Messages() {
 
 							<div className="chat-messages">
 								{messages.map((msg) => {
-									const isMe = msg.sender._id === currentUser._id || msg.sender === currentUser._id;
+									const senderId = msg.sender._id || msg.sender;
+									const isMe = senderId === currentUser._id;
 									return (
 										<div key={msg._id} className={`chat-bubble-row ${isMe ? "chat-bubble-row-me" : ""}`}>
 											<div className={`chat-bubble ${isMe ? "chat-bubble-me" : "chat-bubble-them"}`}>
@@ -167,7 +198,9 @@ function Messages() {
 										</div>
 									);
 								})}
-								{typingUser && <p className="typing-indicator">{typingUser} is typing...</p>}
+								{typingInfo && typingInfo.conversationId === activeConversation._id && (
+									<p className="typing-indicator">{typingInfo.userName} is typing...</p>
+								)}
 								<div ref={messagesEndRef}></div>
 							</div>
 
@@ -176,10 +209,8 @@ function Messages() {
 									type="text"
 									placeholder={`Message ${getOtherParticipant(activeConversation)?.fullName}...`}
 									value={draft}
-									onChange={(e) => {
-										setDraft(e.target.value);
-										handleTyping();
-									}}
+									onChange={handleDraftChange}
+									maxLength={2000}
 								/>
 								<button type="submit" className="chat-send-btn" aria-label="Send message">
 									<i className="ti ti-send" aria-hidden="true"></i>
