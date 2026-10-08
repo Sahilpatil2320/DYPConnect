@@ -106,6 +106,7 @@ function Dashboard() {
             const res = await api.post("/posts", { content: newPostText });
             setPosts([res.data, ...posts]);
             setNewPostText("");
+            setShowPostModal(false);
         } catch (err) {
             console.error("Failed to create post:", err);
         } finally {
@@ -268,7 +269,6 @@ function Dashboard() {
                                             type="submit"
                                             className="btn btn-primary"
                                             disabled={posting || !newPostText.trim()}
-                                            onClick={() => setShowPostModal(false)}
                                         >
                                             {posting ? "Posting..." : "Post"}
                                         </button>
