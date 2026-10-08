@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import DashboardNavbar from "./components/DashboardNavbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop";
 
 import LandingPage from "./pages/LandingPage";
 
@@ -32,6 +33,7 @@ function App() {
 
     return (
         <>
+            <ScrollToTop />
             {isDashboardRoute ? <DashboardNavbar /> : <Navbar />}
             <Routes>
                 <Route path="/" element={<LandingPage />} />

@@ -58,6 +58,8 @@ function LandingPage() {
         {
             icon: "ti-school",
             title: "Students",
+            joinLabel: "Student",
+            signupPath: "/signup/student",
             points: [
                 "Connect with seniors and faculty",
                 "Showcase skills and achievements",
@@ -68,6 +70,8 @@ function LandingPage() {
         {
             icon: "ti-presentation",
             title: "Teachers",
+            joinLabel: "Teacher",
+            signupPath: "/signup/teacher",
             points: [
                 "Share workshops and announcements",
                 "Mentor and guide students",
@@ -78,6 +82,8 @@ function LandingPage() {
         {
             icon: "ti-briefcase",
             title: "Alumni",
+            joinLabel: "Alumni",
+            signupPath: "/signup/alumni",
             points: [
                 "Reconnect with your college",
                 "Mentor current students",
@@ -242,8 +248,8 @@ function LandingPage() {
                                         <li key={pt}>{pt}</li>
                                     ))}
                                 </ul>
-                                <Link to="/signup" className="btn btn-outline role-info-btn">
-                                    Join as {r.title.slice(0, -1)}
+                                <Link to={r.signupPath} className="btn btn-outline role-info-btn">
+                                    Join as {r.joinLabel}
                                 </Link>
                             </div>
                         ))}
