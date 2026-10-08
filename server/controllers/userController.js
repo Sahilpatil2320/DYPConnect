@@ -48,20 +48,23 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 exports.searchUsers = async (req, res) => {
     try {
-        const query = req.query.q || "";
-        if (!query.trim()) return res.json([]);
+        const query = typeof req.query.q === "string" ? req.query.q.trim().slice(0, 50) : "";
+        if (!query) return res.json([]);
 
         const users = await User.find({
             _id: { $ne: req.userId },
-            fullName: { $regex: query, $options: "i" },
+            fullName: { $regex: escapeRegex(query), $options: "i" },
         })
             .select("fullName role department designation graduationYear currentCompany bio")
             .limit(8);
 
         res.json(users);
     } catch (err) {
-        res.status(500).json({ message: "Error searching users.", error: err.message });
+        console.error("Search error:", err.message);
+        res.status(500).json({ message: "Error searching users." });
     }
 };
