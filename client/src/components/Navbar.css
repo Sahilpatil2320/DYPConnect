@@ -20,6 +20,10 @@
     gap: 8px;
     font-size: 1.25rem;
     font-weight: 700;
+    background: none;
+    color: var(--color-text);
+    padding: 0;
+    cursor: pointer;
 }
 
 .logo-icon {

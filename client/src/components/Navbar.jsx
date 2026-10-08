@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { getTheme, toggleTheme } from "../utils/theme";
+import { useLandingNav } from "../utils/useLandingNav";
 import "./Navbar.css";
 
 function Navbar() {
     const [isDark, setIsDark] = useState(getTheme() === "dark");
+    const { goToSection, goToTop } = useLandingNav();
 
     useEffect(() => {
         const handleThemeChange = () => setIsDark(getTheme() === "dark");
@@ -13,22 +15,27 @@ function Navbar() {
         return () => window.removeEventListener("themeChanged", handleThemeChange);
     }, []);
 
+    const handleNavClick = (e, id) => {
+        e.preventDefault();
+        goToSection(id);
+    };
+
     return (
         <header className="navbar">
             <div className="container navbar-inner">
-                <div className="navbar-logo">
+                <button className="navbar-logo" onClick={goToTop} aria-label="Go to DYPConnect home">
                     <img src={logo} alt="DYPConnect logo" className="logo-icon" />
                     <span className="logo-text">
                         DYP<span className="logo-accent">Connect</span>
                     </span>
-                </div>
+                </button>
 
                 <nav className="navbar-links">
-                    <a href="#home">Home</a>
-                    <a href="#about">About</a>
-                    <a href="#features">Features</a>
-                    <a href="#network">Network</a>
-                    <a href="#contact">Contact</a>
+                    <a href="/#home" onClick={(e) => handleNavClick(e, "home")}>Home</a>
+                    <a href="/#about" onClick={(e) => handleNavClick(e, "about")}>About</a>
+                    <a href="/#features" onClick={(e) => handleNavClick(e, "features")}>Features</a>
+                    <a href="/#network" onClick={(e) => handleNavClick(e, "network")}>Network</a>
+                    <a href="/#contact" onClick={(e) => handleNavClick(e, "contact")}>Contact</a>
                 </nav>
 
                 <div className="navbar-actions">

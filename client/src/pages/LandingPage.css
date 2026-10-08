@@ -1,3 +1,29 @@
+/* Shared section styles */
+.section {
+    padding: 72px 0;
+}
+
+.section-alt {
+    background: var(--color-bg-soft);
+}
+
+.section-heading {
+    text-align: center;
+    font-size: 1.9rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: var(--color-text);
+}
+
+.section-subheading {
+    text-align: center;
+    color: var(--color-text-muted);
+    max-width: 680px;
+    margin: 0 auto 40px;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
 /* Hero */
 .hero {
     background: linear-gradient(180deg, var(--color-bg-soft) 0%, var(--color-bg) 100%);
@@ -16,6 +42,7 @@
     font-weight: 800;
     line-height: 1.15;
     margin-bottom: 20px;
+    color: var(--color-text);
 }
 
 .hero-highlight {
@@ -27,25 +54,27 @@
     font-size: 1.05rem;
     margin-bottom: 28px;
     max-width: 480px;
+    line-height: 1.6;
 }
 
 .hero-actions {
     display: flex;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
-/* .hero-image-placeholder {
-  height: 320px;
-  border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-navy) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-align: center;
-} */
+.hero-image-placeholder {
+    height: 320px;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-navy) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: center;
+}
 
 .hero-image-photo {
     width: 100%;
@@ -55,18 +84,51 @@
     display: block;
 }
 
-/* Features */
-.features {
-    padding: 72px 0;
+/* About */
+.about-grid,
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
 
-.section-heading {
+.about-card,
+.contact-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 28px 22px;
     text-align: center;
-    font-size: 1.9rem;
-    font-weight: 800;
-    margin-bottom: 40px;
 }
 
+.about-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: var(--color-bg-soft);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 14px;
+}
+
+.about-card h3,
+.contact-card h3 {
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+    color: var(--color-text);
+}
+
+.about-card p,
+.contact-card p {
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+/* Features */
 .features-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -74,11 +136,11 @@
 }
 
 .feature-card {
+    background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     padding: 28px 20px;
     text-align: center;
-    background: var(--color-surface);
 }
 
 .feature-icon {
@@ -86,27 +148,139 @@
     height: 56px;
     border-radius: 50%;
     background: var(--color-primary);
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     margin: 0 auto 16px;
 }
 
 .feature-card h3 {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     margin-bottom: 8px;
+    color: var(--color-text);
 }
 
 .feature-card p {
     color: var(--color-text-muted);
-    font-size: 0.92rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
 }
 
-/* Stats */
+/* How it works */
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.step-card {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 32px 22px 26px;
+    text-align: center;
+}
+
+.step-number {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: white;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-icon {
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin-bottom: 12px;
+}
+
+.step-card h3 {
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+    color: var(--color-text);
+}
+
+.step-card p {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+/* Who it's for */
+.roles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.role-info-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 28px 22px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.role-info-card h3 {
+    font-size: 1.15rem;
+    margin-bottom: 14px;
+    color: var(--color-text);
+}
+
+.role-info-card ul {
+    text-align: left;
+    margin-bottom: 20px;
+    flex: 1;
+}
+
+.role-info-card li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+.role-info-card li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--color-primary);
+    font-weight: 800;
+}
+
+.role-info-btn {
+    width: 100%;
+}
+
+/* Network / Stats */
 .stats {
     background: var(--color-navy);
-    padding: 40px 0;
+    padding: 64px 0;
+}
+
+.stats .section-heading {
+    color: white;
+}
+
+.stats .section-subheading {
+    color: #CBD5E1;
+    margin-bottom: 36px;
 }
 
 .stats-grid {
@@ -116,28 +290,131 @@
 }
 
 .stat-value {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 800;
     color: white;
 }
 
 .stat-label {
-    color: #94A3B8;
+    color: #CBD5E1;
     font-size: 0.9rem;
     margin-top: 4px;
 }
 
-@media (max-width: 860px) {
-    .hero-inner {
-        grid-template-columns: 1fr;
-    }
+/* FAQ */
+.faq-list {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
+.faq-item {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+}
+
+.faq-question {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: none;
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: left;
+    padding: 16px 20px;
+}
+
+.faq-question i {
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.faq-answer {
+    padding: 0 20px 18px;
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+    line-height: 1.65;
+}
+
+/* Call to action */
+.cta-band {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-navy) 100%);
+    padding: 64px 0;
+    color: white;
+    text-align: center;
+}
+
+.cta-band h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.cta-band p {
+    color: #E0F2FE;
+    margin-bottom: 26px;
+}
+
+.cta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cta-band .btn-primary {
+    background: white;
+    color: var(--color-primary-dark);
+}
+
+.cta-band .btn-primary:hover {
+    background: #E0F2FE;
+}
+
+.cta-band .btn-outline {
+    border-color: white;
+    color: white;
+}
+
+.cta-band .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Responsive */
+@media (max-width: 960px) {
     .features-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 860px) {
+
+    .hero-inner,
+    .about-grid,
+    .contact-grid,
+    .steps-grid,
+    .roles-grid {
+        grid-template-columns: 1fr;
     }
 
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 24px;
+    }
+}
+
+@media (max-width: 560px) {
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-text h1 {
+        font-size: 2.2rem;
     }
 }
