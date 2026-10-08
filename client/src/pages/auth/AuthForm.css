@@ -15,6 +15,7 @@
     max-width: 440px;
     width: 100%;
     position: relative;
+    color: var(--color-text);
 }
 
 .auth-back {

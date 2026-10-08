@@ -1,4 +1,5 @@
 :root {
+    color-scheme: light;
     --color-primary: #0EA5E9;
     --color-primary-dark: #0284C7;
     --color-primary-light: #38BDF8;
@@ -20,7 +21,8 @@
     --color-primary-light: #7DD3FC;
     --color-bg: #0F172A;
     --color-bg-soft: #1E293B;
-    --color-navy: #38BDF8;
+    --color-navy: #082F49;
+    color-scheme: dark;
     --color-text: #F1F5F9;
     --color-text-muted: #94A3B8;
     --color-border: #334155;
