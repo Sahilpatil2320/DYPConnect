@@ -55,7 +55,7 @@ function StudentSignup() {
             <div className="auth-card">
                 <Link to="/signup" className="auth-back">← Back</Link>
 
-                <div className="auth-icon">🎓</div>
+                <div className="auth-icon"><i className="ti ti-school" aria-hidden="true"></i></div>
                 <h1>Student Sign Up</h1>
                 <p className="auth-subtext">Create your student account</p>
 

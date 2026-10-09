@@ -61,7 +61,7 @@ function AlumniSignup() {
             <div className="auth-card">
                 <Link to="/signup" className="auth-back">← Back</Link>
 
-                <div className="auth-icon">💼</div>
+                <div className="auth-icon"><i className="ti ti-briefcase" aria-hidden="true"></i></div>
                 <h1>Alumni Sign Up</h1>
                 <p className="auth-subtext">Create your alumni account</p>
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import api from "../../utils/api";
 import { getCurrentUser } from "../../utils/auth";
 import "./Opportunities.css";
+import { useEscapeKey } from "../../utils/useEscapeKey";
 
 function Opportunities() {
     const currentUser = getCurrentUser();
@@ -9,6 +10,7 @@ function Opportunities() {
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showPostModal, setShowPostModal] = useState(false);
+    useEscapeKey(() => setShowPostModal(false), showPostModal);
     const [posting, setPosting] = useState(false);
 
     const [form, setForm] = useState({

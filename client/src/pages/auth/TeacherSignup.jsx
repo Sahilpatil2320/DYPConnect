@@ -55,7 +55,7 @@ function TeacherSignup() {
             <div className="auth-card">
                 <Link to="/signup" className="auth-back">← Back</Link>
 
-                <div className="auth-icon">👨‍🏫</div>
+                <div className="auth-icon"><i className="ti ti-presentation" aria-hidden="true"></i></div>
                 <h1>Teacher Sign Up</h1>
                 <p className="auth-subtext">Create your faculty account</p>
 

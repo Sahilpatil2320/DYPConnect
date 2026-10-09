@@ -1,5 +1,6 @@
 .dash-navbar {
-    background: var(--color-surface);;
+    background: var(--color-surface);
+    ;
     border-bottom: 1px solid var(--color-border);
     position: sticky;
     top: 0;
@@ -26,8 +27,8 @@
 .dash-logo-icon {
     width: 30px;
     height: 30px;
+    border-radius: 8px;
     object-fit: contain;
-    mix-blend-mode: multiply;
 }
 
 .dash-logo-text {
@@ -117,15 +118,6 @@
     }
 }
 
-@media (max-width: 860px) {
-    .dash-search {
-        display: none;
-    }
-
-    .dash-tab span {
-        display: none;
-    }
-}
 
 .dash-profile-menu {
     position: relative;
@@ -135,7 +127,8 @@
     position: absolute;
     top: 46px;
     right: 0;
-    background: var(--color-surface);;
+    background: var(--color-surface);
+    ;
     border: 1px solid var(--color-border);
     border-radius: 10px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -218,7 +211,8 @@
     position: absolute;
     top: 46px;
     right: 0;
-    background: var(--color-surface);;
+    background: var(--color-surface);
+    ;
     border: 1px solid var(--color-border);
     border-radius: 10px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -307,4 +301,49 @@
 
 .dash-dropdown-logout:hover {
     background: #FEE2E2;
+}
+
+@media (max-width: 860px) {
+    .dash-navbar-inner {
+        flex-wrap: wrap;
+        height: auto;
+        gap: 10px;
+        padding: 8px 12px 0;
+    }
+
+    /* Lets the tabs and avatar become direct children of the bar so they can be reordered */
+    .dash-right-group {
+        display: contents;
+    }
+
+    .dash-logo {
+        order: 1;
+    }
+
+    .dash-profile-menu {
+        order: 3;
+    }
+
+    .dash-tabs {
+        order: 4;
+        width: 100%;
+        justify-content: space-around;
+        gap: 0;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .dash-tab {
+        flex: 1;
+        padding: 8px 2px 6px;
+    }
+}
+
+@media (max-width: 520px) {
+    .dash-tab>span:last-child {
+        display: none;
+    }
+
+    .dash-tab i {
+        font-size: 1.4rem;
+    }
 }

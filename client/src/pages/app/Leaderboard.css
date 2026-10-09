@@ -130,3 +130,7 @@
     font-size: 0.7rem;
     color: var(--color-text-muted);
 }
+
+.leaderboard-flame {
+    color: #EA580C;
+}

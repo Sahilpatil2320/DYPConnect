@@ -40,7 +40,7 @@ function Leaderboard() {
                 <Link to="/daily-challenge" className="auth-back">← Back to Daily Challenge</Link>
 
                 <div className="leaderboard-header">
-                    <h1>🔥 Streak Leaderboard</h1>
+                    <h1><i className="ti ti-flame leaderboard-flame" aria-hidden="true"></i> Streak Leaderboard</h1>
                     <p className="leaderboard-subtext">
                         Top streaks from {scope === "department" ? `the ${currentUser.department || "your"} department` : "across the college"}
                     </p>
@@ -87,7 +87,7 @@ function Leaderboard() {
                                         <p className="leaderboard-dept">{leader.department}</p>
                                     </div>
                                     <div className="leaderboard-streak">
-                                        <span className="leaderboard-streak-num">🔥 {leader.currentStreak}</span>
+                                        <span className="leaderboard-streak-num"><i className="ti ti-flame leaderboard-flame" aria-hidden="true"></i> {leader.currentStreak}</span>
                                         <span className="leaderboard-streak-label">day streak</span>
                                     </div>
                                 </div>

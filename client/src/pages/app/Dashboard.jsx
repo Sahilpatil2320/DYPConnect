@@ -5,6 +5,7 @@ import { getInitials } from "../../utils/getInitials";
 import { getTheme, toggleTheme } from "../../utils/theme";
 import api from "../../utils/api";
 import "./Dashboard.css";
+import { useEscapeKey } from "../../utils/useEscapeKey";
 
 const PAGE_SIZE = 10;
 
@@ -42,6 +43,7 @@ function Dashboard() {
     const [openCommentId, setOpenCommentId] = useState(null);
     const [commentDrafts, setCommentDrafts] = useState({});
     const [showPostModal, setShowPostModal] = useState(false);
+    useEscapeKey(() => setShowPostModal(false), showPostModal);
     const [streak, setStreak] = useState(0);
     const [stats, setStats] = useState({ connections: 0, posts: 0 });
     const [latestOpportunities, setLatestOpportunities] = useState([]);

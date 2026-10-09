@@ -152,7 +152,7 @@ function DailyChallenge() {
         return (
             <div className="daily-challenge-page">
                 <div className="daily-challenge-card">
-                    <div className="daily-challenge-icon">🔥</div>
+                    <div className="daily-challenge-icon"><i className="ti ti-flame" aria-hidden="true"></i></div>
                     <h1>Daily Challenge</h1>
                     <p className="daily-challenge-subtext">
                         No questions available for your department yet. Check back soon!
@@ -167,11 +167,11 @@ function DailyChallenge() {
             <div className="daily-challenge-card">
                 <div className="streak-row">
                     <div className="streak-stat">
-                        <span className="streak-num">🔥 {currentStreak}</span>
+                        <span className="streak-num"><i className="ti ti-flame streak-flame" aria-hidden="true"></i> {currentStreak}</span>
                         <span className="streak-label">Current Streak</span>
                     </div>
                     <div className="streak-stat">
-                        <span className="streak-num">🏆 {longestStreak}</span>
+                        <span className="streak-num"><i className="ti ti-trophy streak-trophy" aria-hidden="true"></i> {longestStreak}</span>
                         <span className="streak-label">Longest Streak</span>
                     </div>
                 </div>

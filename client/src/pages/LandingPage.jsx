@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { scrollToSection } from "../utils/scroll";
 import { useLandingNav } from "../utils/useLandingNav";
 import "./LandingPage.css";
+import campusImage from "../assets/campus.jpg";
 
 function LandingPage() {
     const location = useLocation();
@@ -158,8 +159,11 @@ function LandingPage() {
                     <div className="hero-image">
                         {/* If you added your campus photo earlier, put your <img> back here:
                 <img src={campusImage} alt="Campus" className="hero-image-photo" /> */}
-                        <div className="hero-image-placeholder">D Y PATIL COLLEGE, KOLHAPUR</div>
-                    </div>
+                        <img
+                            src={campusImage}
+                            alt="D Y Patil College of Engineering and Technology, Kolhapur"
+                            className="hero-image-photo"
+                        />                    </div>
                 </div>
             </section>
 

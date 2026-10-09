@@ -8,9 +8,9 @@ function SignupRoleSelection() {
     const navigate = useNavigate();
 
     const roles = [
-        { id: "student", icon: "🎓", title: "Student", desc: "Join as a student and connect." },
-        { id: "teacher", icon: "👨‍🏫", title: "Teacher", desc: "Join as a teacher or faculty." },
-        { id: "alumni", icon: "💼", title: "Alumni", desc: "Join as an alumnus and stay connected." },
+        { id: "student", icon: "ti-school", title: "Student", desc: "Join as a student and connect." },
+        { id: "teacher", icon: "ti-presentation", title: "Teacher", desc: "Join as a teacher or faculty." },
+        { id: "alumni", icon: "ti-briefcase", title: "Alumni", desc: "Join as an alumnus and stay connected." },
     ];
 
     return (
@@ -30,7 +30,7 @@ function SignupRoleSelection() {
                             className={`role-card ${selectedRole === role.id ? "role-card-active" : ""}`}
                             onClick={() => setSelectedRole(role.id)}
                         >
-                            <span className="role-icon">{role.icon}</span>
+                            <span className="role-icon"><i className={"ti " + role.icon} aria-hidden="true"></i></span>
                             <span className="role-title">{role.title}</span>
                             <span className="role-desc">{role.desc}</span>
                         </button>
