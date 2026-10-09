@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getCurrentUser, logoutUser } from "../../utils/auth";
-import api from "../../utils/api";
-import "./Dashboard.css";
 import { getInitials } from "../../utils/getInitials";
 import { getTheme, toggleTheme } from "../../utils/theme";
+import api from "../../utils/api";
+import "./Dashboard.css";
 
+const PAGE_SIZE = 10;
 
 function Dashboard() {
     const currentUser = getCurrentUser();
@@ -33,67 +34,77 @@ function Dashboard() {
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(false);
+    const [page, setPage] = useState(1);
     const [newPostText, setNewPostText] = useState("");
-    const [showPostModal, setShowPostModal] = useState(false);
     const [posting, setPosting] = useState(false);
     const [openCommentId, setOpenCommentId] = useState(null);
     const [commentDrafts, setCommentDrafts] = useState({});
+    const [showPostModal, setShowPostModal] = useState(false);
     const [streak, setStreak] = useState(0);
     const [stats, setStats] = useState({ connections: 0, posts: 0 });
-
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const res = await api.get("/users/stats");
-                setStats(res.data);
-            } catch (err) {
-                console.error("Failed to fetch stats:", err);
-            }
-        };
-        fetchStats();
-    }, []);
+    const [latestOpportunities, setLatestOpportunities] = useState([]);
     const [isDark, setIsDark] = useState(getTheme() === "dark");
+
+    const handleToggleDarkMode = () => {
+        toggleTheme();
+        setIsDark(getTheme() === "dark");
+    };
 
     useEffect(() => {
         const handleThemeChange = () => setIsDark(getTheme() === "dark");
         window.addEventListener("themeChanged", handleThemeChange);
         return () => window.removeEventListener("themeChanged", handleThemeChange);
     }, []);
-    const fetchFeed = async () => {
-        setLoading(true);
+
+    const fetchFeed = async (pageToLoad = 1) => {
+        if (pageToLoad === 1) setLoading(true);
+        else setLoadingMore(true);
+
         try {
-            const res = await api.get("/posts");
-            setPosts(res.data);
+            const res = await api.get(`/posts?page=${pageToLoad}&limit=${PAGE_SIZE}`);
+            const incoming = res.data.posts;
+
+            setPosts((prev) =>
+                pageToLoad === 1
+                    ? incoming
+                    : [...prev, ...incoming.filter((p) => !prev.some((existing) => existing._id === p._id))]
+            );
+            setHasMore(res.data.hasMore);
+            setPage(pageToLoad);
         } catch (err) {
             console.error("Failed to load feed:", err);
         } finally {
             setLoading(false);
+            setLoadingMore(false);
         }
     };
 
-    const handleToggleDarkMode = () => {
-        const newTheme = toggleTheme();
-        setIsDark(newTheme === "dark");
-    };
-
     useEffect(() => {
-        fetchFeed();
+        fetchFeed(1);
 
-        const handleRefresh = () => fetchFeed();
+        const handleRefresh = () => fetchFeed(1);
         window.addEventListener("refreshFeed", handleRefresh);
         return () => window.removeEventListener("refreshFeed", handleRefresh);
     }, []);
 
     useEffect(() => {
-        const fetchStreak = async () => {
+        const loadSidebarData = async () => {
             try {
-                const res = await api.get("/challenge/streak");
-                setStreak(res.data.currentStreak);
+                const [streakRes, statsRes, oppRes] = await Promise.all([
+                    api.get("/challenge/streak"),
+                    api.get("/users/stats"),
+                    api.get("/opportunities?limit=3"),
+                ]);
+                setStreak(streakRes.data.currentStreak);
+                setStats(statsRes.data);
+                setLatestOpportunities(oppRes.data);
             } catch (err) {
-                console.error("Failed to fetch streak:", err);
+                console.error("Failed to load sidebar data:", err);
             }
         };
-        fetchStreak();
+        loadSidebarData();
     }, []);
 
     useEffect(() => {
@@ -115,7 +126,7 @@ function Dashboard() {
         setPosting(true);
         try {
             const res = await api.post("/posts", { content: newPostText });
-            setPosts([res.data, ...posts]);
+            setPosts((prev) => [res.data, ...prev]);
             setStats((s) => ({ ...s, posts: s.posts + 1 }));
             setNewPostText("");
             setShowPostModal(false);
@@ -126,11 +137,23 @@ function Dashboard() {
         }
     };
 
+    const handleDeletePost = async (postId) => {
+        if (!window.confirm("Delete this post? This can't be undone.")) return;
+
+        try {
+            await api.delete(`/posts/${postId}`);
+            setPosts((prev) => prev.filter((p) => p._id !== postId));
+            setStats((s) => ({ ...s, posts: Math.max(0, s.posts - 1) }));
+        } catch (err) {
+            console.error("Failed to delete post:", err);
+        }
+    };
+
     const handleLike = async (postId) => {
         try {
             const res = await api.post(`/posts/${postId}/like`);
-            setPosts(
-                posts.map((p) => (p._id === postId ? { ...p, likes: res.data.likes } : p))
+            setPosts((prev) =>
+                prev.map((p) => (p._id === postId ? { ...p, likes: res.data.likes } : p))
             );
         } catch (err) {
             console.error("Failed to like post:", err);
@@ -143,10 +166,10 @@ function Dashboard() {
 
         try {
             const res = await api.post(`/posts/${postId}/comment`, { text });
-            setPosts(
-                posts.map((p) => (p._id === postId ? { ...p, comments: res.data } : p))
+            setPosts((prev) =>
+                prev.map((p) => (p._id === postId ? { ...p, comments: res.data } : p))
             );
-            setCommentDrafts({ ...commentDrafts, [postId]: "" });
+            setCommentDrafts((prev) => ({ ...prev, [postId]: "" }));
         } catch (err) {
             console.error("Failed to add comment:", err);
         }
@@ -155,26 +178,24 @@ function Dashboard() {
     const timeAgo = (dateStr) => {
         const diffMs = Date.now() - new Date(dateStr).getTime();
         const mins = Math.floor(diffMs / 60000);
+        if (mins < 1) return "Just now";
         if (mins < 60) return `${mins}m ago`;
         const hrs = Math.floor(mins / 60);
         if (hrs < 24) return `${hrs}h ago`;
         return `${Math.floor(hrs / 24)}d ago`;
     };
 
-    const upcomingEvents = [
-        { id: 1, type: "Workshop", title: "AI/ML Bootcamp", date: "Oct 4, 2026", tag: "event" },
-        { id: 2, type: "Internship", title: "Frontend Dev Intern @ Zeta", date: "Apply by Oct 10", tag: "opportunity" },
-        { id: 3, type: "Event", title: "Alumni Meet 2026", date: "Oct 18, 2026", tag: "event" },
-    ];
+    const opportunityTag = (type) =>
+        type === "internship" || type === "job" ? "opportunity" : "event";
+
+    const typeLabel = (type) => type.charAt(0).toUpperCase() + type.slice(1);
 
     return (
         <div className="dashboard">
             <div className="dashboard-grid">
                 <aside className="dashboard-left">
                     <div className="profile-card">
-                        <div className="profile-avatar">
-                            {getInitials(user.name)}
-                        </div>
+                        <div className="profile-avatar">{getInitials(user.name)}</div>
                         <h3 className="profile-name">{user.name}</h3>
                         <p className="profile-role">{user.role} · {user.department}</p>
                         <p className="profile-year">{user.year}</p>
@@ -211,15 +232,15 @@ function Dashboard() {
                         </Link>
                         <hr className="sidebar-shortcut-divider" />
 
-                        <button className="sidebar-shortcut-item" disabled>
-                            <i className="ti ti-settings" aria-hidden="true"></i>
-                            Settings
-                        </button>
-                        <hr className="sidebar-shortcut-divider" />
-
                         <button className="sidebar-shortcut-item" onClick={handleToggleDarkMode}>
                             <i className={`ti ${isDark ? "ti-sun" : "ti-moon"}`} aria-hidden="true"></i>
                             {isDark ? "Light Mode" : "Dark Mode"}
+                        </button>
+                        <hr className="sidebar-shortcut-divider" />
+
+                        <button className="sidebar-shortcut-item" disabled>
+                            <i className="ti ti-settings" aria-hidden="true"></i>
+                            Settings
                         </button>
                         <hr className="sidebar-shortcut-divider" />
 
@@ -229,7 +250,10 @@ function Dashboard() {
                         </button>
                         <hr className="sidebar-shortcut-divider" />
 
-                        <button className="sidebar-shortcut-item sidebar-shortcut-logout" onClick={handleLogoutClick}>
+                        <button
+                            className="sidebar-shortcut-item sidebar-shortcut-logout"
+                            onClick={handleLogoutClick}
+                        >
                             <i className="ti ti-logout" aria-hidden="true"></i>
                             Log Out
                         </button>
@@ -238,9 +262,7 @@ function Dashboard() {
 
                 <main className="dashboard-feed">
                     <div className="create-post-box" onClick={() => setShowPostModal(true)}>
-                        <div className="post-avatar-small">
-                            {getInitials(user.name)}
-                        </div>
+                        <div className="post-avatar-small">{getInitials(user.name)}</div>
                         <div className="create-post-input">
                             Share an update, achievement or opportunity...
                         </div>
@@ -257,9 +279,7 @@ function Dashboard() {
                                 </div>
 
                                 <div className="post-modal-user">
-                                    <div className="post-avatar-small">
-                                        {user.name.split(" ").map((n) => n[0]).join("").toUpperCase()}
-                                    </div>
+                                    <div className="post-avatar-small">{getInitials(user.name)}</div>
                                     <div>
                                         <p className="post-author">{user.name}</p>
                                         <p className="post-meta">{user.role} · {user.department}</p>
@@ -275,6 +295,7 @@ function Dashboard() {
                                         disabled={posting}
                                         autoFocus
                                         rows={6}
+                                        maxLength={3000}
                                     />
                                     <div className="post-modal-footer">
                                         <button
@@ -295,20 +316,32 @@ function Dashboard() {
                     <div className="feed-posts">
                         {posts.map((post) => {
                             const hasLiked = post.likes.includes(currentUser._id);
+                            const isMine = post.author?._id === currentUser._id;
+
                             return (
                                 <div className="post-card" key={post._id}>
                                     <div className="post-header">
-                                        <div className="post-avatar-small">
-                                            {getInitials(post.author?.fullName)}
-                                        </div>
+                                        <div className="post-avatar-small">{getInitials(post.author?.fullName)}</div>
                                         <div>
                                             <p className="post-author">{post.author?.fullName || "Unknown"}</p>
                                             <p className="post-meta">
                                                 {roleLabels[post.author?.role] || ""} · {timeAgo(post.createdAt)}
                                             </p>
                                         </div>
+                                        {isMine && (
+                                            <button
+                                                className="post-delete-btn"
+                                                onClick={() => handleDeletePost(post._id)}
+                                                aria-label="Delete post"
+                                                title="Delete post"
+                                            >
+                                                <i className="ti ti-trash" aria-hidden="true"></i>
+                                            </button>
+                                        )}
                                     </div>
+
                                     <p className="post-content">{post.content}</p>
+
                                     <div className="post-actions">
                                         <button
                                             className="post-action"
@@ -343,11 +376,12 @@ function Dashboard() {
                                                     placeholder="Write a comment..."
                                                     value={commentDrafts[post._id] || ""}
                                                     onChange={(e) =>
-                                                        setCommentDrafts({ ...commentDrafts, [post._id]: e.target.value })
+                                                        setCommentDrafts((prev) => ({ ...prev, [post._id]: e.target.value }))
                                                     }
                                                     onKeyDown={(e) => {
                                                         if (e.key === "Enter") handleAddComment(post._id);
                                                     }}
+                                                    maxLength={500}
                                                 />
                                                 <button onClick={() => handleAddComment(post._id)}>Post</button>
                                             </div>
@@ -361,20 +395,43 @@ function Dashboard() {
                             <p className="feed-refreshing">No posts yet. Be the first to share something!</p>
                         )}
                     </div>
+
+                    {hasMore && (
+                        <button
+                            className="feed-load-more"
+                            onClick={() => fetchFeed(page + 1)}
+                            disabled={loadingMore}
+                        >
+                            {loadingMore ? "Loading..." : "Load more posts"}
+                        </button>
+                    )}
                 </main>
 
                 <aside className="dashboard-right">
-                    <h4 className="sidebar-heading">Upcoming Events & Opportunities</h4>
-                    <div className="event-list">
-                        {upcomingEvents.map((item) => (
-                            <div className="event-item" key={item.id}>
-                                <span className={`event-tag event-tag-${item.tag}`}>{item.type}</span>
-                                <p className="event-title">{item.title}</p>
-                                <p className="event-date">{item.date}</p>
-                            </div>
-                        ))}
-                    </div>
-                    <Link to="/opportunities" className="sidebar-viewall">View all opportunities →</Link>
+                    <h4 className="sidebar-heading">Latest Opportunities</h4>
+
+                    {latestOpportunities.length === 0 ? (
+                        <p className="sidebar-empty">No opportunities posted yet.</p>
+                    ) : (
+                        <div className="event-list">
+                            {latestOpportunities.map((item) => (
+                                <div className="event-item" key={item._id}>
+                                    <span className={`event-tag event-tag-${opportunityTag(item.type)}`}>
+                                        {typeLabel(item.type)}
+                                    </span>
+                                    <p className="event-title">{item.title}</p>
+                                    <p className="event-date">
+                                        {item.org}
+                                        {item.deadline ? ` · ${item.deadline}` : ""}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <Link to="/opportunities" className="sidebar-viewall">
+                        View all opportunities →
+                    </Link>
                 </aside>
             </div>
         </div>

@@ -28,14 +28,47 @@ exports.createPost = async (req, res) => {
 
 exports.getFeed = async (req, res) => {
     try {
+        const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+        const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 10, 1), 30);
+
+        // Ask for one extra post so we know whether another page exists
         const posts = await Post.find()
             .populate("author", "fullName role department")
             .populate("comments.author", "fullName")
-            .sort({ createdAt: -1 });
-        res.json(posts);
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit + 1);
+
+        const hasMore = posts.length > limit;
+        if (hasMore) posts.pop();
+
+        res.json({ posts, hasMore });
     } catch (err) {
         console.error("Get feed error:", err.message);
         res.status(500).json({ message: "Error fetching feed." });
+    }
+};
+
+exports.deletePost = async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).json({ message: "Post not found." });
+        }
+
+        const post = await Post.findById(req.params.id).select("author");
+        if (!post) return res.status(404).json({ message: "Post not found." });
+
+        if (post.author.toString() !== req.userId) {
+            return res.status(403).json({ message: "You can only delete your own posts." });
+        }
+
+        await Post.deleteOne({ _id: post._id });
+        await Notification.deleteMany({ post: post._id });
+
+        res.json({ message: "Post deleted." });
+    } catch (err) {
+        console.error("Delete post error:", err.message);
+        res.status(500).json({ message: "Error deleting post." });
     }
 };
 
@@ -56,7 +89,6 @@ exports.toggleLike = async (req, res) => {
         const updated = await Post.findByIdAndUpdate(post._id, update, { new: true }).select("likes");
 
         if (alreadyLiked) {
-            // Unliking removes the notification the author received
             await Notification.deleteOne({
                 recipient: post.author,
                 sender: req.userId,

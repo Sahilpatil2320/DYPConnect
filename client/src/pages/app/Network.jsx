@@ -85,9 +85,7 @@ function Network() {
 
     const stats = [
         { label: "Connections", count: connections.length, icon: "ti-users" },
-        { label: "Groups", count: 3, icon: "ti-users-group" },
-        { label: "Events", count: 2, icon: "ti-calendar-event" },
-        { label: "Departments", count: 6, icon: "ti-building" },
+        { label: "Invitations", count: invitations.length, icon: "ti-user-plus" },
     ];
 
     return (

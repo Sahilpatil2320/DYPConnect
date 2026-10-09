@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import api from "../../utils/api";
 import "./DailyChallenge.css";
 
+const TIME_LIMIT_SECONDS = 5 * 60;
+
 function DailyChallenge() {
     const [loading, setLoading] = useState(true);
     const [question, setQuestion] = useState(null);
@@ -16,11 +18,12 @@ function DailyChallenge() {
     const [result, setResult] = useState(null);
     const [noQuestions, setNoQuestions] = useState(false);
     const [elapsedSeconds, setElapsedSeconds] = useState(null);
+    const [syncKey, setSyncKey] = useState(0);
     const timerRef = useRef(null);
-    const TIME_LIMIT_SECONDS = 5 * 60;
 
-    const fetchToday = async () => {
-        setLoading(true);
+    // silent = refresh in the background without showing the loading screen
+    const fetchToday = async ({ silent = false } = {}) => {
+        if (!silent) setLoading(true);
         try {
             const res = await api.get("/challenge/today");
             if (!res.data.question) {
@@ -35,14 +38,16 @@ function DailyChallenge() {
                 if (!res.data.alreadyAnswered) {
                     setElapsedSeconds(res.data.elapsedSeconds);
                 }
+                setSyncKey((k) => k + 1);
             }
         } catch (err) {
             console.error("Failed to load today's question:", err);
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
+    // Load on open. Pause the server clock when leaving this page inside the app.
     useEffect(() => {
         fetchToday();
 
@@ -53,11 +58,45 @@ function DailyChallenge() {
         };
     }, []);
 
+    // Pause when the tab is hidden or closed, and resume when it comes back.
+    useEffect(() => {
+        const baseUrl = api.defaults.baseURL;
+
+        const pauseOnServer = () => {
+            const token = localStorage.getItem("dypconnect_token");
+            if (!token) return;
+            // keepalive lets this request finish even while the tab is closing
+            fetch(`${baseUrl}/challenge/pause`, {
+                method: "POST",
+                keepalive: true,
+                headers: { Authorization: `Bearer ${token}` },
+            }).catch(() => { });
+        };
+
+        const handleVisibility = () => {
+            if (document.visibilityState === "hidden") {
+                pauseOnServer();
+            } else {
+                fetchToday({ silent: true });
+            }
+        };
+
+        document.addEventListener("visibilitychange", handleVisibility);
+        window.addEventListener("pagehide", pauseOnServer);
+
+        return () => {
+            document.removeEventListener("visibilitychange", handleVisibility);
+            window.removeEventListener("pagehide", pauseOnServer);
+        };
+    }, []);
+
+    // The visible clock. It stands still while the tab is hidden.
     useEffect(() => {
         if (elapsedSeconds === null || alreadyAnswered || result) return;
+        if (document.visibilityState === "hidden") return;
 
         if (elapsedSeconds >= TIME_LIMIT_SECONDS) {
-            handleTimeout();
+            fetchToday({ silent: true });
             return;
         }
 
@@ -66,16 +105,7 @@ function DailyChallenge() {
         }, 1000);
 
         return () => clearTimeout(timerRef.current);
-    }, [elapsedSeconds, alreadyAnswered, result]);
-
-    const handleTimeout = async () => {
-        setSubmitting(true);
-        try {
-            await fetchToday();
-        } finally {
-            setSubmitting(false);
-        }
-    };
+    }, [elapsedSeconds, alreadyAnswered, result, syncKey]);
 
     const handleSubmit = async () => {
         if (selectedOption === null) return;

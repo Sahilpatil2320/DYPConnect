@@ -9,6 +9,7 @@ const PUBLIC_PROFILE_FIELDS =
 exports.getSuggestions = async (req, res) => {
     try {
         const existingConnections = await Connection.find({
+            status: { $ne: "rejected" },
             $or: [{ requester: req.userId }, { recipient: req.userId }],
         });
 
