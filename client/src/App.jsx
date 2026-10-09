@@ -16,6 +16,7 @@ import StudentLogin from "./pages/auth/StudentLogin";
 import TeacherLogin from "./pages/auth/TeacherLogin";
 import AlumniLogin from "./pages/auth/AlumniLogin";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 import Dashboard from "./pages/app/Dashboard";
 import Network from "./pages/app/Network";
@@ -54,6 +55,7 @@ function App() {
                 <Route path="/daily-challenge" element={<ProtectedRoute><DailyChallenge /></ProtectedRoute>} />
                 <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password/:token" element={<ResetPassword />} />
             </Routes>
             {!isDashboardRoute && <Footer />}
         </>

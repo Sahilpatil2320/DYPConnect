@@ -3,9 +3,20 @@ const Answer = require("../models/Answer");
 const User = require("../models/User");
 
 const TIME_LIMIT_SECONDS = 5 * 60;
+const TIMEZONE = "Asia/Kolkata";
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Dates are calendar days in India time, written as YYYY-MM-DD
+function dateString(timestamp) {
+    return new Date(timestamp).toLocaleDateString("en-CA", { timeZone: TIMEZONE });
+}
 
 function getTodayString() {
-    return new Date().toISOString().split("T")[0];
+    return dateString(Date.now());
+}
+
+function getYesterdayString() {
+    return dateString(Date.now() - DAY_MS);
 }
 
 function pickDailyQuestion(questions, dateStr) {
@@ -14,6 +25,24 @@ function pickDailyQuestion(questions, dateStr) {
         hash = (hash * 31 + dateStr.charCodeAt(i)) % questions.length;
     }
     return questions[hash];
+}
+
+async function getTodaysQuestionForUser(user) {
+    // Sorted so the daily pick is the same for everyone in the department
+    const questions = await Question.find({ department: user.department }).sort({ _id: 1 });
+    if (questions.length === 0) return null;
+    return pickDailyQuestion(questions, getTodayString());
+}
+
+// A streak only counts if the last correct answer was today or yesterday
+function activeStreak(user) {
+    if (
+        user.lastAnsweredDate === getTodayString() ||
+        user.lastAnsweredDate === getYesterdayString()
+    ) {
+        return user.currentStreak;
+    }
+    return 0;
 }
 
 async function resetStreak(user) {
@@ -42,32 +71,30 @@ exports.getTodayQuestion = async (req, res) => {
         const user = await User.findById(req.userId);
         const today = getTodayString();
 
-        const existingAnswer = await Answer.findOne({ user: req.userId, answeredDate: today });
-
-        const questions = await Question.find({ department: user.department });
-        if (questions.length === 0) {
+        const todaysQuestion = await getTodaysQuestionForUser(user);
+        if (!todaysQuestion) {
             return res.json({ question: null, message: "No questions available for your department yet." });
         }
 
-        const todaysQuestion = pickDailyQuestion(questions, today);
+        const publicQuestion = {
+            _id: todaysQuestion._id,
+            questionText: todaysQuestion.questionText,
+            options: todaysQuestion.options,
+        };
 
+        const existingAnswer = await Answer.findOne({ user: req.userId, answeredDate: today });
         if (existingAnswer) {
             return res.json({
-                question: {
-                    _id: todaysQuestion._id,
-                    questionText: todaysQuestion.questionText,
-                    options: todaysQuestion.options,
-                },
+                question: publicQuestion,
                 alreadyAnswered: true,
                 wasCorrect: existingAnswer.isCorrect,
                 timedOut: existingAnswer.selectedOptionIndex === -1,
-                currentStreak: user.currentStreak,
+                currentStreak: activeStreak(user),
                 longestStreak: user.longestStreak,
             });
         }
 
         ensureFreshDay(user, today);
-
         if (!user.questionSessionStartedAt) {
             user.questionSessionStartedAt = new Date();
         }
@@ -88,11 +115,7 @@ exports.getTodayQuestion = async (req, res) => {
             await resetStreak(user);
 
             return res.json({
-                question: {
-                    _id: todaysQuestion._id,
-                    questionText: todaysQuestion.questionText,
-                    options: todaysQuestion.options,
-                },
+                question: publicQuestion,
                 alreadyAnswered: true,
                 wasCorrect: false,
                 timedOut: true,
@@ -102,19 +125,16 @@ exports.getTodayQuestion = async (req, res) => {
         }
 
         res.json({
-            question: {
-                _id: todaysQuestion._id,
-                questionText: todaysQuestion.questionText,
-                options: todaysQuestion.options,
-            },
+            question: publicQuestion,
             alreadyAnswered: false,
             elapsedSeconds: Math.floor(liveElapsed),
             timeLimit: TIME_LIMIT_SECONDS,
-            currentStreak: user.currentStreak,
+            currentStreak: activeStreak(user),
             longestStreak: user.longestStreak,
         });
     } catch (err) {
-        res.status(500).json({ message: "Error fetching today's question.", error: err.message });
+        console.error("Get today's question error:", err.message);
+        res.status(500).json({ message: "Error fetching today's question." });
     }
 };
 
@@ -134,7 +154,8 @@ exports.pauseTimer = async (req, res) => {
 
         res.json({ message: "Timer paused." });
     } catch (err) {
-        res.status(500).json({ message: "Error pausing timer.", error: err.message });
+        console.error("Pause timer error:", err.message);
+        res.status(500).json({ message: "Error pausing timer." });
     }
 };
 
@@ -149,16 +170,26 @@ exports.submitAnswer = async (req, res) => {
             return res.status(400).json({ message: "You've already answered today's question." });
         }
 
+        const question = await getTodaysQuestionForUser(user);
+        if (!question || question._id.toString() !== String(questionId)) {
+            return res.status(400).json({ message: "That isn't today's question." });
+        }
+
+        if (
+            !Number.isInteger(selectedOptionIndex) ||
+            selectedOptionIndex < 0 ||
+            selectedOptionIndex >= question.options.length
+        ) {
+            return res.status(400).json({ message: "Please choose one of the options." });
+        }
+
         ensureFreshDay(user, today);
         const liveElapsed = getLiveElapsedSeconds(user);
-
-        const question = await Question.findById(questionId);
-        if (!question) return res.status(404).json({ message: "Question not found." });
 
         if (liveElapsed >= TIME_LIMIT_SECONDS) {
             await Answer.create({
                 user: req.userId,
-                question: questionId,
+                question: question._id,
                 selectedOptionIndex: -1,
                 isCorrect: false,
                 answeredDate: today,
@@ -179,7 +210,7 @@ exports.submitAnswer = async (req, res) => {
 
         await Answer.create({
             user: req.userId,
-            question: questionId,
+            question: question._id,
             selectedOptionIndex,
             isCorrect,
             answeredDate: today,
@@ -188,11 +219,7 @@ exports.submitAnswer = async (req, res) => {
         user.questionSessionStartedAt = null;
 
         if (isCorrect) {
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            const yesterdayStr = yesterday.toISOString().split("T")[0];
-
-            if (user.lastAnsweredDate === yesterdayStr) {
+            if (user.lastAnsweredDate === getYesterdayString()) {
                 user.currentStreak += 1;
             } else {
                 user.currentStreak = 1;
@@ -215,16 +242,20 @@ exports.submitAnswer = async (req, res) => {
             longestStreak: user.longestStreak,
         });
     } catch (err) {
-        res.status(500).json({ message: "Error submitting answer.", error: err.message });
+        console.error("Submit answer error:", err.message);
+        res.status(500).json({ message: "Error submitting answer." });
     }
 };
 
 exports.getStreak = async (req, res) => {
     try {
-        const user = await User.findById(req.userId).select("currentStreak longestStreak");
-        res.json({ currentStreak: user.currentStreak, longestStreak: user.longestStreak });
+        const user = await User.findById(req.userId).select(
+            "currentStreak longestStreak lastAnsweredDate"
+        );
+        res.json({ currentStreak: activeStreak(user), longestStreak: user.longestStreak });
     } catch (err) {
-        res.status(500).json({ message: "Error fetching streak.", error: err.message });
+        console.error("Get streak error:", err.message);
+        res.status(500).json({ message: "Error fetching streak." });
     }
 };
 
@@ -235,13 +266,18 @@ exports.getLeaderboard = async (req, res) => {
 
         const filter = scope === "department" ? { department: user.department } : {};
 
-        const leaders = await User.find({ ...filter, currentStreak: { $gt: 0 } })
+        const leaders = await User.find({
+            ...filter,
+            currentStreak: { $gt: 0 },
+            lastAnsweredDate: { $in: [getTodayString(), getYesterdayString()] },
+        })
             .select("fullName role department currentStreak longestStreak")
             .sort({ currentStreak: -1, longestStreak: -1 })
             .limit(20);
 
         res.json(leaders);
     } catch (err) {
-        res.status(500).json({ message: "Error fetching leaderboard.", error: err.message });
+        console.error("Leaderboard error:", err.message);
+        res.status(500).json({ message: "Error fetching leaderboard." });
     }
 };

@@ -29,8 +29,6 @@ function Dashboard() {
                 : currentUser.graduationYear
                     ? `Class of ${currentUser.graduationYear}`
                     : "",
-        connections: 128,
-        profileViews: 45,
     };
 
     const [posts, setPosts] = useState([]);
@@ -41,6 +39,19 @@ function Dashboard() {
     const [openCommentId, setOpenCommentId] = useState(null);
     const [commentDrafts, setCommentDrafts] = useState({});
     const [streak, setStreak] = useState(0);
+    const [stats, setStats] = useState({ connections: 0, posts: 0 });
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await api.get("/users/stats");
+                setStats(res.data);
+            } catch (err) {
+                console.error("Failed to fetch stats:", err);
+            }
+        };
+        fetchStats();
+    }, []);
     const [isDark, setIsDark] = useState(getTheme() === "dark");
 
     useEffect(() => {
@@ -105,6 +116,7 @@ function Dashboard() {
         try {
             const res = await api.post("/posts", { content: newPostText });
             setPosts([res.data, ...posts]);
+            setStats((s) => ({ ...s, posts: s.posts + 1 }));
             setNewPostText("");
             setShowPostModal(false);
         } catch (err) {
@@ -169,12 +181,12 @@ function Dashboard() {
 
                         <div className="profile-stats">
                             <div className="profile-stat">
-                                <span className="stat-num">{user.connections}</span>
+                                <span className="stat-num">{stats.connections}</span>
                                 <span className="stat-label">Connections</span>
                             </div>
                             <div className="profile-stat">
-                                <span className="stat-num">{user.profileViews}</span>
-                                <span className="stat-label">Profile Views</span>
+                                <span className="stat-num">{stats.posts}</span>
+                                <span className="stat-label">Posts</span>
                             </div>
                         </div>
 

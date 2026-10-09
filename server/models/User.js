@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema(
         questionProgressDate: { type: String },
         lastVisitedOpportunities: { type: Date, default: Date.now },
         lastVisitedFeed: { type: Date, default: Date.now },
+        passwordResetToken: { type: String, select: false },
+        passwordResetExpires: { type: Date, select: false },
     },
     { timestamps: true }
 );

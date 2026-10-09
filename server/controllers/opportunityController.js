@@ -50,6 +50,7 @@ exports.getNewOpportunitiesCount = async (req, res) => {
         const user = await User.findById(req.userId);
         const count = await Opportunity.countDocuments({
             createdAt: { $gt: user.lastVisitedOpportunities },
+            postedBy: { $ne: req.userId },
         });
         res.json({ count });
     } catch (err) {
