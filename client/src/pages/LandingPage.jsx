@@ -157,8 +157,6 @@ function LandingPage() {
                     </div>
 
                     <div className="hero-image">
-                        {/* If you added your campus photo earlier, put your <img> back here:
-                <img src={campusImage} alt="Campus" className="hero-image-photo" /> */}
                         <img
                             src={campusImage}
                             alt="D Y Patil College of Engineering and Technology, Kolhapur"
