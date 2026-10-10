@@ -1,13 +1,14 @@
 import { io } from "socket.io-client";
 
+// Turns "https://your-api.onrender.com/api" into "https://your-api.onrender.com"
 const SOCKET_URL = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace("/api", "")
-    : "http://localhost:5000";
+  ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "")
+  : "http://localhost:5000";
 
 const socket = io(SOCKET_URL, {
-    autoConnect: false,
-    // Reads the token fresh on every connect attempt
-    auth: (cb) => cb({ token: localStorage.getItem("dypconnect_token") }),
+  autoConnect: false,
+  // Reads the token fresh on every connect attempt
+  auth: (cb) => cb({ token: localStorage.getItem("dypconnect_token") }),
 });
 
 export default socket;
