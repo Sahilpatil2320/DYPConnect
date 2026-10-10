@@ -1,6 +1,11 @@
 const NAVBAR_OFFSET = 80;
 
 function animateScrollTo(targetY) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        window.scrollTo(0, targetY);
+        return;
+    }
+
     const startY = window.scrollY;
     const distance = targetY - startY;
     if (Math.abs(distance) < 2) return;

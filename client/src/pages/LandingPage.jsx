@@ -4,11 +4,15 @@ import { scrollToSection } from "../utils/scroll";
 import { useLandingNav } from "../utils/useLandingNav";
 import "./LandingPage.css";
 import campusImage from "../assets/campus.jpg";
+import { useScrollReveal } from "../utils/useScrollReveal";
 
 function LandingPage() {
     const location = useLocation();
     const { goToSection } = useLandingNav();
     const [openFaq, setOpenFaq] = useState(null);
+    useScrollReveal(
+        ".section-heading, .section-subheading, .about-card, .feature-card, .step-card, .role-info-card, .stat-item, .faq-item, .contact-card"
+    );
 
     // Handles arriving from another page (e.g. clicking "About" on the Login page)
     useEffect(() => {

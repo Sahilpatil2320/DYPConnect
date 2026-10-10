@@ -313,8 +313,23 @@ function Dashboard() {
                         </div>
                     )}
 
-                    {loading && <p className="feed-refreshing">Loading feed...</p>}
-
+                    {loading && (
+                        <div className="feed-posts" aria-label="Loading feed">
+                            {[1, 2, 3].map((n) => (
+                                <div className="skeleton-post" key={n}>
+                                    <div className="skeleton-row">
+                                        <div className="skeleton skeleton-circle"></div>
+                                        <div className="skeleton-lines">
+                                            <div className="skeleton skeleton-line" style={{ width: "40%" }}></div>
+                                            <div className="skeleton skeleton-line" style={{ width: "25%" }}></div>
+                                        </div>
+                                    </div>
+                                    <div className="skeleton skeleton-line" style={{ width: "95%" }}></div>
+                                    <div className="skeleton skeleton-line" style={{ width: "80%" }}></div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     <div className="feed-posts">
                         {posts.map((post) => {
                             const hasLiked = post.likes.includes(currentUser._id);

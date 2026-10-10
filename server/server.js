@@ -22,6 +22,7 @@ const Message = require("./models/Message");
 const { getConversationIfMember } = require("./utils/chatAccess");
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 5000;
 
 connectDB();

@@ -20,11 +20,11 @@ function getYesterdayString() {
 }
 
 function pickDailyQuestion(questions, dateStr) {
-    let hash = 0;
-    for (let i = 0; i < dateStr.length; i++) {
-        hash = (hash * 31 + dateStr.charCodeAt(i)) % questions.length;
-    }
-    return questions[hash];
+  // Counts days since 1970, so each day moves to the next question
+  // and a department goes through all of its questions before any repeat.
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const dayNumber = Math.floor(Date.UTC(year, month - 1, day) / DAY_MS);
+  return questions[dayNumber % questions.length];
 }
 
 async function getTodaysQuestionForUser(user) {

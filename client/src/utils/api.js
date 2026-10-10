@@ -15,6 +15,23 @@ const SILENT_URL_PARTS = [
     "invitations-count",
 ];
 
+// Free hosts put the server to sleep when idle. If the first request is slow, say why.
+let serverAwake = false;
+let wakeTimer = null;
+
+function startWakeTimer() {
+    if (serverAwake || wakeTimer) return;
+    wakeTimer = setTimeout(() => {
+        toast.info("Waking up the server. This can take up to a minute the first time.");
+    }, 4000);
+}
+
+function stopWakeTimer(responded) {
+    if (responded) serverAwake = true;
+    clearTimeout(wakeTimer);
+    wakeTimer = null;
+}
+
 function shouldToast(error) {
     const config = error.config || {};
     const url = config.url || "";
@@ -42,12 +59,18 @@ api.interceptors.request.use((config) => {
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
+    startWakeTimer();
     return config;
 });
 
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        stopWakeTimer(true);
+        return response;
+    },
     (error) => {
+        stopWakeTimer(!!error.response);
+
         const status = error.response?.status;
         const hadToken = !!localStorage.getItem("dypconnect_token");
 

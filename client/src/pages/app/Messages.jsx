@@ -17,6 +17,7 @@ function Messages() {
 	const [draft, setDraft] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [typingInfo, setTypingInfo] = useState(null);
+	const [showChatOnMobile, setShowChatOnMobile] = useState(!!requestedConversationId);
 
 	// A ref always holds the CURRENT open chat, even inside long-lived socket handlers
 	const activeIdRef = useRef(null);
@@ -146,8 +147,7 @@ function Messages() {
 	return (
 		<div className="messages-page">
 			<div className="messages-container">
-				<aside className="conversation-list">
-					<h4 className="sidebar-heading">Messaging</h4>
+				<aside className={`conversation-list ${showChatOnMobile ? "mobile-hidden" : ""}`}>					<h4 className="sidebar-heading">Messaging</h4>
 
 					{conversations.length === 0 && (
 						<p className="notifications-empty">
@@ -161,7 +161,10 @@ function Messages() {
 							<button
 								key={conv._id}
 								className={`conversation-item ${activeConversation?._id === conv._id ? "conversation-item-active" : ""}`}
-								onClick={() => selectConversation(conv)}
+								onClick={() => {
+									selectConversation(conv);
+									setShowChatOnMobile(true);
+								}}
 							>
 								<div className="post-avatar-small">{getInitials(other?.fullName)}</div>
 								<div className="conversation-info">
@@ -173,10 +176,17 @@ function Messages() {
 					})}
 				</aside>
 
-				<main className="chat-window">
+				<main className={`chat-window ${showChatOnMobile ? "" : "mobile-hidden"}`}>
 					{activeConversation ? (
 						<>
 							<div className="chat-header">
+								<button
+									className="chat-back-btn"
+									onClick={() => setShowChatOnMobile(false)}
+									aria-label="Back to conversations"
+								>
+									<i className="ti ti-arrow-left" aria-hidden="true"></i>
+								</button>
 								<div className="post-avatar-small">
 									{getInitials(getOtherParticipant(activeConversation)?.fullName)}
 								</div>

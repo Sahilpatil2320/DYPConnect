@@ -1,0 +1,334 @@
+/* ================= DYPConnect polish layer ================= */
+
+html {
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    overflow-x: clip;
+}
+
+::selection {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+img {
+    max-width: 100%;
+}
+
+button,
+.btn {
+    touch-action: manipulation;
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* ---------- Posts, bios and chat keep their line breaks ---------- */
+.post-content,
+.opportunity-desc,
+.profile-section-card p,
+.chat-bubble p {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.comment-item,
+.notification-text {
+    overflow-wrap: anywhere;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease,
+        box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ---------- Cards: smooth transitions ---------- */
+.about-card,
+.contact-card,
+.feature-card,
+.step-card,
+.role-info-card,
+.suggestion-tile,
+.role-card,
+.post-card,
+.opportunity-card,
+.notification-item,
+.leaderboard-item,
+.faq-item {
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease,
+        background-color 0.22s ease;
+}
+
+.feature-icon,
+.about-icon {
+    transition: transform 0.22s ease, background-color 0.22s ease, color 0.22s ease;
+}
+
+/* ---------- Hover effects (mouse devices only, so phones never get stuck hovers) ---------- */
+@media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(14, 165, 233, 0.35);
+    }
+
+    .btn-outline:hover {
+        transform: translateY(-1px);
+        border-color: var(--color-primary-dark);
+        color: var(--color-primary-dark);
+    }
+
+    /* Showcase cards: lift, grow slightly and tint */
+    .about-card:hover,
+    .contact-card:hover,
+    .feature-card:hover,
+    .step-card:hover,
+    .role-info-card:hover,
+    .suggestion-tile:hover,
+    .role-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 14px 30px rgba(2, 132, 199, 0.16);
+        border-color: var(--color-primary-light);
+        background-color: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
+    }
+
+    .feature-card:hover .feature-icon,
+    .role-info-card:hover .feature-icon {
+        transform: scale(1.12) rotate(-6deg);
+    }
+
+    .about-card:hover .about-icon,
+    .contact-card:hover .about-icon {
+        background: var(--color-primary);
+        color: #fff;
+    }
+
+    /* List items: a gentler lift, because they are wide */
+    .post-card:hover,
+    .opportunity-card:hover,
+    .notification-item:hover,
+    .leaderboard-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(2, 132, 199, 0.12);
+        border-color: var(--color-primary-light);
+    }
+
+    .faq-item:hover {
+        border-color: var(--color-primary-light);
+    }
+
+    .daily-option:not(:disabled):hover {
+        transform: translateX(4px);
+    }
+
+    /* Public navbar links get an animated underline */
+    .navbar-links a {
+        position: relative;
+    }
+
+    .navbar-links a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -6px;
+        width: 100%;
+        height: 2px;
+        background: var(--color-primary);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.2s ease;
+    }
+
+    .navbar-links a:hover::after {
+        transform: scaleX(1);
+    }
+}
+
+.daily-option {
+    transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+/* ---------- Pages fade in when you open them ---------- */
+@keyframes page-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.auth-page,
+.dashboard,
+.network-page,
+.opportunities-page,
+.messages-page,
+.notifications-page,
+.profile-page,
+.daily-challenge-page,
+.leaderboard-page {
+    animation: page-in 0.3s ease backwards;
+}
+
+/* ---------- Landing page scroll reveal ---------- */
+.reveal {
+    opacity: 0;
+}
+
+.reveal-in {
+    animation: reveal-up 0.6s ease backwards;
+    animation-delay: var(--reveal-delay, 0ms);
+}
+
+@keyframes reveal-up {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ---------- Skeleton loading placeholders ---------- */
+.skeleton {
+    background: linear-gradient(90deg,
+            var(--color-border) 25%,
+            var(--color-bg-soft) 37%,
+            var(--color-border) 63%);
+    background-size: 400% 100%;
+    animation: skeleton-shimmer 1.4s ease infinite;
+    border-radius: 8px;
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+.skeleton-post {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.skeleton-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.skeleton-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.skeleton-lines {
+    flex: 1;
+}
+
+.skeleton-line {
+    height: 12px;
+    margin-bottom: 10px;
+}
+
+/* ---------- Respect people who turn animations off ---------- */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ---------- Phones and small tablets ---------- */
+@media (max-width: 860px) {
+
+    /* 16px stops iPhones from zooming in when you tap a field */
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+@media (max-width: 560px) {
+    .section {
+        padding: 48px 0;
+    }
+
+    .section-heading {
+        font-size: 1.5rem;
+    }
+
+    .hero {
+        padding: 36px 0;
+    }
+
+    .cta-band h2 {
+        font-size: 1.4rem;
+    }
+
+    .auth-page {
+        padding: 24px 14px;
+    }
+
+    .auth-card,
+    .role-select-card {
+        padding: 26px 18px;
+    }
+
+    .daily-challenge-card {
+        padding: 28px 18px;
+    }
+
+    .dashboard,
+    .network-page,
+    .messages-page {
+        padding: 12px 0;
+    }
+
+    .dashboard-grid,
+    .network-grid,
+    .messages-container {
+        padding: 0 12px;
+    }
+
+    .opportunities-container,
+    .notifications-container,
+    .profile-container {
+        padding: 0 14px;
+    }
+
+    .profile-edit-btn {
+        position: static;
+        margin-top: 12px;
+    }
+}
