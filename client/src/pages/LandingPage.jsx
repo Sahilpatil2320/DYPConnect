@@ -5,6 +5,8 @@ import { useLandingNav } from "../utils/useLandingNav";
 import "./LandingPage.css";
 import campusImage from "../assets/campus.jpg";
 import { useScrollReveal } from "../utils/useScrollReveal";
+import api from "../utils/api";
+import { SITE } from "../siteConfig";
 
 function LandingPage() {
     const location = useLocation();
@@ -98,11 +100,21 @@ function LandingPage() {
         },
     ];
 
+    const [liveStats, setLiveStats] = useState(null);
+
+    useEffect(() => {
+        api
+            .get("/public/stats", { silent: true })
+            .then((res) => setLiveStats(res.data))
+            .catch(() => { });
+    }, []);
+
+    // Shows "–" until the real numbers arrive, or if they can't be loaded
     const stats = [
-        { value: "10K+", label: "Community Members" },
-        { value: "50+", label: "Departments" },
-        { value: "500+", label: "Faculty Members" },
-        { value: "8K+", label: "Alumni Network" },
+        { value: liveStats ? liveStats.total : "–", label: "Community Members" },
+        { value: liveStats ? liveStats.students : "–", label: "Students" },
+        { value: liveStats ? liveStats.teachers : "–", label: "Faculty Members" },
+        { value: liveStats ? liveStats.alumni : "–", label: "Alumni" },
     ];
 
     const faqs = [
@@ -129,10 +141,15 @@ function LandingPage() {
     ];
 
     const contactCards = [
-        { icon: "ti-map-pin", title: "Visit us", text: "D Y Patil College of Engineering and Technology, Kasaba Bawada, Kolhapur" },
-        { icon: "ti-mail", title: "Email us", text: "connect@dypatil.edu" },
-        { icon: "ti-phone", title: "Call us", text: "+91 1234567890" },
-    ];
+        { icon: "ti-map-pin", title: "Visit us", text: `${SITE.collegeName}, ${SITE.address}` },
+        SITE.email && { icon: "ti-mail", title: "Email us", text: SITE.email, href: `mailto:${SITE.email}` },
+        SITE.phone && {
+            icon: "ti-phone",
+            title: "Call us",
+            text: SITE.phone,
+            href: `tel:${SITE.phone.replace(/\s/g, "")}`,
+        },
+    ].filter(Boolean);
 
     return (
         <main>
@@ -328,7 +345,11 @@ function LandingPage() {
                                     <i className={`ti ${c.icon}`} aria-hidden="true"></i>
                                 </div>
                                 <h3>{c.title}</h3>
-                                <p>{c.text}</p>
+                                {c.href ? (
+                                    <a href={c.href} className="contact-link">{c.text}</a>
+                                ) : (
+                                    <p>{c.text}</p>
+                                )}
                             </div>
                         ))}
                     </div>

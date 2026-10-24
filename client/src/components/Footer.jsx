@@ -1,6 +1,7 @@
 import logo from "../assets/logo.png";
 import { useLandingNav } from "../utils/useLandingNav";
 import "./Footer.css";
+import { SITE } from "../siteConfig";
 
 function Footer() {
     const { goToSection, goToTop } = useLandingNav();
@@ -43,9 +44,9 @@ function Footer() {
 
                 <div>
                     <h4>Contact Us</h4>
-                    <p>D Y Patil College of Engineering<br />and Technology,<br />Kasaba Bawada, Kolhapur</p>
-                    <p>connect@dypatil.edu</p>
-                    <p>+91 1234567890</p>
+                    <p>{SITE.collegeName},<br />{SITE.address}</p>
+                    {SITE.email && <p>{SITE.email}</p>}
+                    {SITE.phone && <p>{SITE.phone}</p>}
                 </div>
             </div>
 

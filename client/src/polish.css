@@ -332,3 +332,18 @@ button,
         margin-top: 12px;
     }
 }
+
+.contact-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.contact-link {
+    color: var(--color-primary);
+    font-size: 0.92rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.contact-link:hover {
+    text-decoration: underline;
+}

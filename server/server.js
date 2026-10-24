@@ -16,6 +16,7 @@ const opportunityRoutes = require("./routes/opportunityRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const challengeRoutes = require("./routes/challengeRoutes");
+const publicRoutes = require("./routes/publicRoutes");
 
 const User = require("./models/User");
 const Message = require("./models/Message");
@@ -56,6 +57,7 @@ app.use("/api/opportunities", opportunityRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/challenge", challengeRoutes);
+app.use("/api/public", publicRoutes);
 
 const server = http.createServer(app);
 const io = new Server(server, {
